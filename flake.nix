@@ -51,7 +51,20 @@
           };
         })
         (nixpkgs.lib.mkIf optimizeGaming {
-          boot.kernelPackages = pkgs.linuxPackages_xanmod;
+          boot = {
+            kernelPackages = pkgs.linuxPackages_xanmod;
+            kernel.sysctl = {
+              "vm.swappiness" = 10;
+              "kernel.sched_autogroup_enabled" = 0;
+            };
+            kernelParams = [
+              "mitigations=off"
+            ];
+          };
+          graphics = {
+            enable = true;
+            enable32Bit = true;
+          };
         })
         (nixpkgs.lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
