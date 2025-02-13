@@ -56,6 +56,7 @@
         (nixpkgs.lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
           services.xserver.excludePackages = [ pkgs.xterm ];
+          environment.defaultPackages = [];
         })
         (nixpkgs.lib.mkIf portableDevice {
           services.tlp.enable = true;
@@ -64,6 +65,13 @@
         (nixpkgs.lib.mkIf dualBoot {
           time.hardwareClockInLocalTime = true;
           boot.loader.grub.useOSProber = true;
+        })
+        (nixpkgs.lib.mkIf bluetoothService {
+          hardware.bluetooth = {
+            enable = true;
+            powerOnBoot = true;
+          };
+          services.blueman.enable = true;
         })
       ];
     };
