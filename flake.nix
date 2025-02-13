@@ -9,6 +9,7 @@
       hiResAudio ? false,
       optimizeGaming ? false,
       disableNixApps ? false,
+      bluetoothService ? false
       portableDevice ? false,
       dualBoot ? false
     }: 
@@ -17,15 +18,8 @@
       modules = [
         {
           system.stateVersion = "24.11";
+          nixpkgs.config.allowUnfree = true;
           time.timeZone = timeZone;
-          nixpkgs = {
-            system = hostPlatform;
-            config.allowUnfree = true;
-          };
-          hardware = {
-            enableAllFirmware = true;
-            enableRedistributableFirmware = true;
-          };
           networking = {
             hostName = hostName;
             networkmanager.enable = true;
@@ -33,6 +27,10 @@
           users.users.${userName} = {
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
+          };
+          hardware = {
+            enableAllFirmware = true;
+            enableRedistributableFirmware = true;
           };
         }
         (nixpkgs.lib.mkIf hiResAudio {
@@ -52,7 +50,7 @@
         })
         (nixpkgs.lib.mkIf optimizeGaming {
           boot = {
-            kernelPackages = pkgs.linuxPackages_xanmod;
+            kernelPackages = nixpkgs.linuxPackages_xanmod;
             kernel.sysctl = {
               "vm.swappiness" = 10;
               "kernel.sched_autogroup_enabled" = 0;
@@ -68,8 +66,15 @@
         })
         (nixpkgs.lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
-          services.xserver.excludePackages = [ pkgs.xterm ];
+          services.xserver.excludePackages = [ nixpkgs.xterm ];
           environment.defaultPackages = [];
+        })
+        (nixpkgs.lib.mkIf bluetoothService {
+          hardware.bluetooth = {
+            enable = true;
+            powerOnBoot = true;
+          };
+          services.blueman.enable = true;
         })
         (nixpkgs.lib.mkIf portableDevice {
           services.tlp.enable = true;
@@ -78,13 +83,6 @@
         (nixpkgs.lib.mkIf dualBoot {
           time.hardwareClockInLocalTime = true;
           boot.loader.grub.useOSProber = true;
-        })
-        (nixpkgs.lib.mkIf bluetoothService {
-          hardware.bluetooth = {
-            enable = true;
-            powerOnBoot = true;
-          };
-          services.blueman.enable = true;
         })
       ];
     };
