@@ -9,7 +9,7 @@
       hiResAudio ? false,
       optimizeGaming ? false,
       disableNixApps ? false,
-      bluetoothService ? false
+      bluetoothService ? false,
       portableDevice ? false,
       dualBoot ? false
     }: 
