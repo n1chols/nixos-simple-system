@@ -17,7 +17,7 @@
 
       # Features
       disableNixApps ? true,
-      quietStartup ? true,
+      animateStartup ? true,
       gamingTweaks ? false,
       hiResAudio ? false,
       dualBoot ? false,
@@ -72,7 +72,6 @@
             device = swapDevice;
           };
           boot = {
-            initrd.kernelModules = [ "amdgpu" ]; # if vendor gpu is amd
             loader = if bootDevice != "" then {
               systemd-boot.enable = true;
               efi.canTouchEfiVariables = true;
@@ -85,6 +84,31 @@
             };
           };
         }
+        (nixpkgs.lib.mkIf disableNixApps {
+          documentation.nixos.enable = false;
+          services.xserver.excludePackages = [ nixpkgs.xterm ];
+          environment.defaultPackages = [];
+        })
+        (nixpkgs.lib.mkIf animateStartup {
+          boot.plymouth = {
+            enable = true;
+            theme = "spinner";
+          };
+        })
+        (nixpkgs.lib.mkIf gamingTweaks {
+          boot = {
+            kernelPackages = nixpkgs.linuxPackages_xanmod;
+            kernel.sysctl = {
+              "vm.swappiness" = 10;
+              "vm.vfs_cache_pressure" = 50;
+              "kernel.sched_autogroup_enabled" = 0;
+            };
+            kernelParams = [
+              "mitigations=off"
+              "nowatchdog"
+            ];
+          };
+        })
         (nixpkgs.lib.mkIf hiResAudio {
           hardware.pulseaudio.enable = false;
           security.rtkit.enable = true;
@@ -100,38 +124,9 @@
             };
           };
         })
-        (nixpkgs.lib.mkIf optimizeGaming {
-          boot = {
-            kernelPackages = nixpkgs.linuxPackages_xanmod;
-            kernel.sysctl = {
-              "vm.swappiness" = 10;
-              "vm.vfs_cache_pressure" = 50;
-              "kernel.sched_autogroup_enabled" = 0;
-            };
-            kernelParams = [
-              "mitigations=off"
-              "nowatchdog"
-            ];
-          };
-        })
-        (nixpkgs.lib.mkIf disableNixApps {
-          documentation.nixos.enable = false;
-          services.xserver.excludePackages = [ nixpkgs.xterm ];
-          environment.defaultPackages = [];
-        })
-        (nixpkgs.lib.mkIf quietStartup {
-          boot.plymouth = {
-            enable = true;
-            theme = "spinner";
-          };
-        })
         (nixpkgs.lib.mkIf dualBoot {
           time.hardwareClockInLocalTime = true;
           boot.loader.grub.useOSProber = true;
-        })
-        (nixpkgs.lib.mkIf battery {
-          services.tlp.enable = true;
-          services.upower.enable = true;
         })
         (nixpkgs.lib.mkIf touchpad {
           services.xserver.libinput = {
@@ -156,6 +151,10 @@
             nssmdns = true;
             openFirewall = true;
           };
+        })
+        (nixpkgs.lib.mkIf battery {
+          services.tlp.enable = true;
+          services.upower.enable = true;
         })
       ];
     };
