@@ -6,12 +6,15 @@
       userName ? "user",
       systemType ? "x86_64-linux",
       timeZone ? "America/Los_Angeles",
+      cpuVendor ? "intel",
+      gpuVendor ? "intel",
       hiResAudio ? false,
       optimizeGaming ? false,
       disableNixApps ? false,
-      bluetoothService ? false,
       portableDevice ? false,
-      dualBoot ? false
+      dualBoot ? false,
+      bluetooth ? false,
+      printing ? false
     }: 
     nixpkgs.lib.nixosSystem {
       system = systemType;
@@ -28,13 +31,33 @@
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
           };
-          boot.loader = {
-            systemd-boot.enable = true;
-            efi.canTouchEfiVariables = true;
+          boot = {
+            initrd.kernelModules = [ "amdgpu" ];
+            loader = nixpkgs.lib.mkMerge [
+              (nixpkgs.lib.mkIf (!legacyBoot) {
+                systemd-boot.enable = true;
+                efi.canTouchEfiVariables = true;
+              })
+              (nixpkgs.lib.mkIf legacyBoot {
+                grub = {
+                  enable = true;
+                  device = "/dev/sda";
+                  efiSupport = false;
+                };
+              })
+            ];
           };
           hardware = {
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
+            cpu = nixpkgs.lib.mkMerge [
+              (nixpkgs.lib.mkIf (cpuVendor == "intel") {
+                intel.updateMicrocode = true;
+              })
+              (nixpkgs.lib.mkIf (cpuVendor == "amd") {
+                amd.updateMicrocode = true;
+              })
+            ];
           };
         }
         (nixpkgs.lib.mkIf hiResAudio {
