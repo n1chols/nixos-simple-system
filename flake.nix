@@ -8,6 +8,9 @@
       timeZone ? "America/Los_Angeles",
       cpuVendor ? "intel",
       gpuVendor ? "intel",
+      rootDevice ? "/dev/sda"
+      bootDevice ? "",
+      swapDevice ? "",
       hiResAudio ? false,
       optimizeGaming ? false,
       disableNixApps ? false,
@@ -31,22 +34,6 @@
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
           };
-          boot = {
-            initrd.kernelModules = [ "amdgpu" ];
-            loader = nixpkgs.lib.mkMerge [
-              (nixpkgs.lib.mkIf (!legacyBoot) {
-                systemd-boot.enable = true;
-                efi.canTouchEfiVariables = true;
-              })
-              (nixpkgs.lib.mkIf legacyBoot {
-                grub = {
-                  enable = true;
-                  device = "/dev/sda";
-                  efiSupport = false;
-                };
-              })
-            ];
-          };
           hardware = {
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
@@ -58,6 +45,30 @@
                 amd.updateMicrocode = true;
               })
             ];
+          };
+          fileSystems = {
+            "/" = nixpkgs.lib.mkIf (rootDevice != "") {
+              device = rootDevice;
+              fsType = "ext4";
+            };
+          } // nixpkgs.lib.optionalAttrs (bootDevice != "") {
+            "/boot" = {
+              device = bootDevice;
+              fsType = "vfat";
+            };
+          };
+          swapDevices = nixpkgs.lib.optional (swapDevice != "") {
+            device = swapDevice;
+          };
+          boot.loader = if bootDevice != "" then {
+            systemd-boot.enable = true;
+            efi.canTouchEfiVariables = true;
+          } else {
+            grub = {
+              enable = true;
+              device = rootDevice;
+              efiSupport = false;
+            };
           };
         }
         (nixpkgs.lib.mkIf hiResAudio {
@@ -96,12 +107,20 @@
           services.xserver.excludePackages = [ nixpkgs.xterm ];
           environment.defaultPackages = [];
         })
-        (nixpkgs.lib.mkIf bluetoothService {
+        (nixpkgs.lib.mkIf bluetooth {
           hardware.bluetooth = {
             enable = true;
             powerOnBoot = true;
           };
           services.blueman.enable = true;
+        })
+        (nixpkgs.lib.mkIf printing {
+          services.printing.enable = true;
+          services.avahi = {
+            enable = true;
+            nssmdns = true;
+            openFirewall = true;
+          };
         })
         (nixpkgs.lib.mkIf portableDevice {
           services.tlp.enable = true;
