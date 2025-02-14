@@ -2,22 +2,29 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   outputs = { nixpkgs, ... }: {
     mkSystem = {
+      # System
       hostName ? "nixos",
       userName ? "user",
       systemType ? "x86_64-linux",
       timeZone ? "America/Los_Angeles",
+
+      # Hardware
       cpuVendor ? "intel",
       gpuVendor ? "intel",
       rootDevice ? "/dev/sda"
       bootDevice ? "",
       swapDevice ? "",
+
+      # Features
+      disableNixApps ? true,
+      quietStartup ? true,
+      gamingTweaks ? false,
       hiResAudio ? false,
-      optimizeGaming ? false,
-      disableNixApps ? false,
-      portableDevice ? false,
       dualBoot ? false,
+      touchpad ? false,
       bluetooth ? false,
-      printing ? false
+      printing ? false,
+      battery ? false
     }: 
     nixpkgs.lib.nixosSystem {
       system = systemType;
@@ -46,6 +53,10 @@
               })
             ];
           };
+          graphics = {
+            enable = true;
+            enable32Bit = true;
+          };
           fileSystems = {
             "/" = nixpkgs.lib.mkIf (rootDevice != "") {
               device = rootDevice;
@@ -60,14 +71,17 @@
           swapDevices = nixpkgs.lib.optional (swapDevice != "") {
             device = swapDevice;
           };
-          boot.loader = if bootDevice != "" then {
-            systemd-boot.enable = true;
-            efi.canTouchEfiVariables = true;
-          } else {
-            grub = {
-              enable = true;
-              device = rootDevice;
-              efiSupport = false;
+          boot = {
+            initrd.kernelModules = [ "amdgpu" ]; # if vendor gpu is amd
+            loader = if bootDevice != "" then {
+              systemd-boot.enable = true;
+              efi.canTouchEfiVariables = true;
+            } else {
+              grub = {
+                enable = true;
+                device = rootDevice;
+                efiSupport = false;
+              };
             };
           };
         }
@@ -91,21 +105,42 @@
             kernelPackages = nixpkgs.linuxPackages_xanmod;
             kernel.sysctl = {
               "vm.swappiness" = 10;
+              "vm.vfs_cache_pressure" = 50;
               "kernel.sched_autogroup_enabled" = 0;
             };
             kernelParams = [
               "mitigations=off"
+              "nowatchdog"
             ];
-          };
-          graphics = {
-            enable = true;
-            enable32Bit = true;
           };
         })
         (nixpkgs.lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
           services.xserver.excludePackages = [ nixpkgs.xterm ];
           environment.defaultPackages = [];
+        })
+        (nixpkgs.lib.mkIf quietStartup {
+          boot.plymouth = {
+            enable = true;
+            theme = "spinner";
+          };
+        })
+        (nixpkgs.lib.mkIf dualBoot {
+          time.hardwareClockInLocalTime = true;
+          boot.loader.grub.useOSProber = true;
+        })
+        (nixpkgs.lib.mkIf battery {
+          services.tlp.enable = true;
+          services.upower.enable = true;
+        })
+        (nixpkgs.lib.mkIf touchpad {
+          services.xserver.libinput = {
+            enable = true;
+            touchpad = {
+              tapping = true;
+              naturalScrolling = true;
+            };
+          };
         })
         (nixpkgs.lib.mkIf bluetooth {
           hardware.bluetooth = {
@@ -121,14 +156,6 @@
             nssmdns = true;
             openFirewall = true;
           };
-        })
-        (nixpkgs.lib.mkIf portableDevice {
-          services.tlp.enable = true;
-          services.upower.enable = true;
-        })
-        (nixpkgs.lib.mkIf dualBoot {
-          time.hardwareClockInLocalTime = true;
-          boot.loader.grub.useOSProber = true;
         })
       ];
     };
