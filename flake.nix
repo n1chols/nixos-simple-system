@@ -76,7 +76,7 @@
                   nvidiaSettings = true;
                   modesetting.enable = true;
                   open = false;
-                  package = nixpkgs.linuxPackages.nvidiaPackages.stable;
+                  package = nixpkgs.legacyPackages.${systemType}.linuxPackages.nvidiaPackages.stable;
                 };
               })
               (nixpkgs.lib.mkIf (gpuVendor == "amd") {
@@ -140,7 +140,7 @@
         })
         (nixpkgs.lib.mkIf gamingTweaks {
           boot = {
-            kernelPackages = nixpkgs.linuxPackages_xanmod;
+            kernelPackages = nixpkgs.legacyPackages.${systemType}.linuxPackages_xanmod;
             kernel.sysctl = {
               "vm.swappiness" = 10;
               "vm.vfs_cache_pressure" = 50;
