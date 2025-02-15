@@ -76,32 +76,32 @@
         })
       ];
 
-      gpuConfig = lib.mkMerge [
-        {
-          hardware.graphics = {
-            enable = true;
-            enable32Bit = true;
-          };
-        }
-        (lib.mkIf (gpuVendor == "intel") {
-          hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
-        })
-        (lib.mkIf (gpuVendor == "amd") {
-          hardware.amdgpu = {
+      gpuConfig = {
+        hardware = {
+          graphics = lib.mkMerge [
+            {
+              enable = true;
+              enable32Bit = true;
+            }
+            (lib.mkIf (gpuVendor == "intel") {
+              extraPackages = [ pkgs.intel-media-driver ];
+            })
+          ];
+        } // lib.mkIf (gpuVendor == "amd") {
+          amdgpu = {
             enable = true;
             amdvlk = true;
             loadInInitrd = true;
           };
-        })
-        (lib.mkIf (gpuVendor == "nvidia") {
-          hardware.nvidia = {
+        } // lib.mkIf (gpuVendor == "nvidia") {
+          nvidia = {
             open = false;
             nvidiaSettings = true;
             modesetting.enable = true;
             package = pkgs.linuxPackages.nvidiaPackages.stable;
           };
-        })
-      ];
+        };
+      };
 
       # Boot and filesystem configurations
       bootConfig = lib.mkMerge [
