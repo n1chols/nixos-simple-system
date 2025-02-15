@@ -19,6 +19,7 @@
       # Features
       disableNixApps ? true,
       animateStartup ? true,
+      autoUpdate ? true,
       gamingTweaks ? false,
       hiResAudio ? false,
       dualBoot ? false,
@@ -35,6 +36,11 @@
           nixpkgs.config.allowUnfree = true;
           time.timeZone = timeZone;
           console.keyMap = keyLayout;
+          nix.settings = {
+            experimental-features = [ "flakes" ];
+            auto-optimise-store = true;
+            warn-dirty = false;
+          };
           networking = {
             hostName = hostName;
             networkmanager.enable = true;
@@ -118,6 +124,13 @@
           boot.plymouth = {
             enable = true;
             theme = "spinner";
+          };
+        })
+        (nixpkgs.lib.mkIf autoUpgrade {
+          system.autoUpgrade = {
+            enable = true;
+            allowReboot = false;
+            dates = "04:00";
           };
         })
         (nixpkgs.lib.mkIf gamingTweaks {
