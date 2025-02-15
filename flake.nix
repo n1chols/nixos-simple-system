@@ -53,8 +53,9 @@
           i18n.defaultLocale = locale;
           console.keyMap = keyboardLayout;
           networking = {
-            hostName = hostName;
             networkmanager.enable = true;
+            useDHCP = true;
+            hostName = hostName;
           };
           users.users.${userName} = {
             isNormalUser = true;
