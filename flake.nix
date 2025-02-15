@@ -75,18 +75,16 @@
               enable32Bit = true;
               extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [ "intel-media-driver" ];
             };
-          } // nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
-            nvidia = {
-              nvidiaSettings = true;
-              modesetting.enable = true;
-              open = false;
-              package = nixpkgs.legacyPackages.${systemType}.linuxPackages.nvidiaPackages.stable;
-            };
-          } // nixpkgs.lib.mkIf (gpuVendor == "amd") {
-            amdgpu = {
+            amdgpu = nixpkgs.lib.mkIf (gpuVendor == "amd") {
               enable = true;
               amdvlk = true;
               loadInInitrd = true;
+            };
+            nvidia = nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
+              open = false;
+              nvidiaSettings = true;
+              modesetting.enable = true;
+              package = nixpkgs.legacyPackages.${systemType}.linuxPackages.nvidiaPackages.stable;
             };
           };
 
