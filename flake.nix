@@ -28,6 +28,9 @@
       bluetooth ? false,
       printing ? false,
       battery ? false
+
+      # Extra modules
+      extraModules ? []
     }: 
     nixpkgs.lib.nixosSystem {
       system = systemType;
@@ -204,7 +207,7 @@
           services.tlp.enable = true;
           services.upower.enable = true;
         })
-      ];
+      ] ++ extraModules;
     };
   };
 }
