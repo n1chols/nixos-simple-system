@@ -58,7 +58,20 @@
             extraGroups = [ "wheel" "networkmanager" ];
           };
 
-          
+          # Hardware Config
+          # Hardware Config
+          hardware = {
+            enableAllFirmware = true;
+            enableRedistributableFirmware = true;
+            cpu = nixpkgs.lib.mkMerge [
+              (nixpkgs.lib.mkIf (cpuVendor == "intel") {
+                intel.updateMicrocode = true;
+              })
+              (nixpkgs.lib.mkIf (cpuVendor == "amd") {
+                amd.updateMicrocode = true;
+              })
+            ];
+          };
           boot = {
             loader = if bootDevice != "" then {
               systemd-boot.enable = true;
