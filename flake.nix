@@ -70,12 +70,12 @@
                 amd.updateMicrocode = true;
               })
             ];
-            graphics = nixpkgs.lib.mkMerge [{
-              enable = true;
-              enable32Bit = true;
-            } (nixpkgs.lib.mkIf (gpuVendor == "intel") {
-              extraPackages = [ nixpkgs.legacyPackages.${systemType}.intel-media-driver ];
-            })];
+            #graphics = nixpkgs.lib.mkMerge [{
+            #  enable = true;
+            #  enable32Bit = true;
+            #} (nixpkgs.lib.mkIf (gpuVendor == "intel") {
+            #  extraPackages = [ nixpkgs.legacyPackages.${systemType}.intel-media-driver ];
+            #})];
             amdgpu = nixpkgs.lib.mkIf (gpuVendor == "amd") {
               enable = true;
               amdvlk = true;
