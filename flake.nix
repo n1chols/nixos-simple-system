@@ -1,6 +1,6 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-  outputs = { nixpkgs, ... }: {
+  outputs = { config, lib, pkgs, ... }: {
     mkSystem = {
       # System
       hostName ? "nixos",
@@ -32,13 +32,13 @@
       # Extra modules
       extraModules ? []
     }: 
-    nixpkgs.lib.nixosSystem {
+    lib.nixosSystem {
       system = systemType;
       modules = [
         {
           # Nix Config
           system.stateVersion = "24.11";
-          nixpkgs.config.allowUnfree = true;
+          config.allowUnfree = true;
           nix.settings = {
             experimental-features = [ "nix-command" "flakes" ];
             auto-optimise-store = true;
@@ -62,24 +62,24 @@
           hardware = {
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
-            cpu = nixpkgs.lib.mkMerge [
-              (nixpkgs.lib.mkIf (cpuVendor == "intel") {
+            cpu = lib.mkMerge [
+              (lib.mkIf (cpuVendor == "intel") {
                 intel.updateMicrocode = true;
               })
-              (nixpkgs.lib.mkIf (cpuVendor == "amd") {
+              (lib.mkIf (cpuVendor == "amd") {
                 amd.updateMicrocode = true;
               })
             ];
-            gpu = nixpkgs.lib.mkMerge [
-              (nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
+            gpu = lib.mkMerge [
+              (lib.mkIf (gpuVendor == "nvidia") {
                 nvidia = {
                   nvidiaSettings = true;
                   modesetting.enable = true;
                   open = false;
-                  package = nixpkgs.linuxPackages.nvidiaPackages.stable;
+                  package = pkgs.linuxPackages.nvidiaPackages.stable;
                 };
               })
-              (nixpkgs.lib.mkIf (gpuVendor == "amd") {
+              (lib.mkIf (gpuVendor == "amd") {
                 amdgpu = {
                   enable = true;
                   amdvlk = true;
@@ -91,7 +91,7 @@
           graphics = {
             enable = true;
             enable32Bit = true;
-            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [
+            extraPackages = lib.mkIf (gpuVendor == "intel") [
               pkgs.intel-media-driver
             ];
           };
@@ -108,41 +108,41 @@
             };
           };
           fileSystems = {
-            "/" = nixpkgs.lib.mkIf (rootDevice != "") {
+            "/" = lib.mkIf (rootDevice != "") {
               device = rootDevice;
               fsType = "ext4";
             };
-          } // nixpkgs.lib.optionalAttrs (bootDevice != "") {
+          } // lib.optionalAttrs (bootDevice != "") {
             "/boot" = {
               device = bootDevice;
               fsType = "vfat";
             };
           };
-          swapDevices = nixpkgs.lib.optional (swapDevice != "") {
+          swapDevices = lib.optional (swapDevice != "") {
             device = swapDevice;
           };
         }
-        (nixpkgs.lib.mkIf disableNixApps {
+        (lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
-          services.xserver.excludePackages = [ nixpkgs.xterm ];
+          services.xserver.excludePackages = [ pkgs.xterm ];
           environment.defaultPackages = [];
         })
-        (nixpkgs.lib.mkIf animateStartup {
+        (lib.mkIf animateStartup {
           boot.plymouth = {
             enable = true;
             theme = "spinner";
           };
         })
-        (nixpkgs.lib.mkIf autoUpgrade {
+        (lib.mkIf autoUpgrade {
           system.autoUpgrade = {
             enable = true;
             allowReboot = false;
             dates = "04:00";
           };
         })
-        (nixpkgs.lib.mkIf gamingTweaks {
+        (lib.mkIf gamingTweaks {
           boot = {
-            kernelPackages = nixpkgs.linuxPackages_xanmod;
+            kernelPackages = pkgs.linuxPackages_xanmod;
             kernel.sysctl = {
               "vm.swappiness" = 10;
               "vm.vfs_cache_pressure" = 50;
@@ -154,7 +154,7 @@
             ];
           };
         })
-        (nixpkgs.lib.mkIf hiResAudio {
+        (lib.mkIf hiResAudio {
           hardware.pulseaudio.enable = false;
           security.rtkit.enable = true;
           services.pipewire = {
@@ -169,11 +169,11 @@
             };
           };
         })
-        (nixpkgs.lib.mkIf dualBoot {
+        (lib.mkIf dualBoot {
           time.hardwareClockInLocalTime = true;
           boot.loader.grub.useOSProber = true;
         })
-        (nixpkgs.lib.mkIf touchpad {
+        (lib.mkIf touchpad {
           services.xserver.libinput = {
             enable = true;
             touchpad = {
@@ -182,14 +182,14 @@
             };
           };
         })
-        (nixpkgs.lib.mkIf bluetooth {
+        (lib.mkIf bluetooth {
           hardware.bluetooth = {
             enable = true;
             powerOnBoot = true;
           };
           services.blueman.enable = true;
         })
-        (nixpkgs.lib.mkIf printing {
+        (lib.mkIf printing {
           services.printing.enable = true;
           services.avahi = {
             enable = true;
@@ -197,7 +197,7 @@
             openFirewall = true;
           };
         })
-        (nixpkgs.lib.mkIf battery {
+        (lib.mkIf battery {
           services.tlp.enable = true;
           services.upower.enable = true;
         })
