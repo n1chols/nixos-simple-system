@@ -59,7 +59,6 @@
           };
 
           # Hardware Config
-          # Hardware Config
           hardware = {
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
@@ -71,6 +70,12 @@
                 amd.updateMicrocode = true;
               })
             ];
+            graphics = nixpkgs.lib.mkMerge [{
+              enable = true;
+              enable32Bit = true;
+            } (nixpkgs.lib.mkIf (gpuVendor == "intel") {
+              extraPackages = [ nixpkgs.legacyPackages.${systemType}.intel-media-driver ];
+            };
           };
           boot = {
             loader = if bootDevice != "" then {
