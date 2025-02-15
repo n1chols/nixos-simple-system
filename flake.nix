@@ -76,6 +76,17 @@
             } (nixpkgs.lib.mkIf (gpuVendor == "intel") {
               extraPackages = [ nixpkgs.legacyPackages.${systemType}.intel-media-driver ];
             })];
+            amdgpu = nixpkgs.lib.mkIf (gpuVendor == "amd") {
+              enable = true;
+              amdvlk = true;
+              loadInInitrd = true;
+            };
+            nvidia = nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
+              open = false;
+              nvidiaSettings = true;
+              modesetting.enable = true;
+              package = nixpkgs.legacyPackages.${systemType}.linuxPackages.nvidiaPackages.stable;
+            };
           };
           boot = {
             loader = if bootDevice != "" then {
@@ -137,7 +148,7 @@
           };
         })
         (nixpkgs.lib.mkIf hiResAudio {
-          hardware.pulseaudio.enable = false;
+          services.pulseaudio.enable = false;
           security.rtkit.enable = true;
           services.pipewire = {
             enable = true;
