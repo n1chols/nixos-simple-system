@@ -91,10 +91,9 @@
           graphics = {
             enable = true;
             enable32Bit = true;
-            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") 
-              (with nixpkgs; [
-                intel-media-driver
-              ]);
+            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [
+              nixpkgs.intel-media-driver
+            ];
           };
           boot = {
             loader = if bootDevice != "" then {
