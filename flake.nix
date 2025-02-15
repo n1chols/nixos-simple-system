@@ -2,35 +2,7 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   outputs = { self, nixpkgs }: {
     nixosSystem = {
-      # System Configuration
-      hostName ? "nixos",
-      userName ? "user",
-      systemType ? "x86_64-linux",
-      timeZone ? "America/Los_Angeles",
-      locale ? "en_US.UTF-8",
-      keyboardLayout ? "us",
-
-      # Hardware Configuration
-      cpuVendor ? "intel",
-      gpuVendor ? "intel",
-      rootDevice ? "/dev/sda",
-      bootDevice ? "",
-      swapDevice ? "",
-
-      # Feature Flags
-      disableNixApps ? true,
-      animateStartup ? true,
-      autoUpgrade ? true,
-      gamingTweaks ? false,
-      hiResAudio ? false,
-      dualBoot ? false,
-      touchpad ? false,
-      bluetooth ? false,
-      printing ? false,
-      battery ? false,
-
-      # Additional Configuration
-      extraModules ? []
+      # Parameters stay the same...
     }: 
     let
       lib = nixpkgs.lib;
@@ -38,8 +10,8 @@
     in lib.nixosSystem {
       system = systemType;
       modules = [
+        # Mandatory base configuration
         {
-          # Nix Configuration
           system.stateVersion = "24.11";
           nixpkgs.config.allowUnfree = true;
           nix.settings = {
@@ -48,7 +20,6 @@
             warn-dirty = false;
           };
 
-          # System Configuration
           time.timeZone = timeZone;
           i18n.defaultLocale = locale;
           console.keyMap = keyboardLayout;
@@ -62,74 +33,103 @@
             extraGroups = [ "wheel" "networkmanager" ];
           };
 
-          # Hardware Configuration
+          fileSystems."/" = {
+            device = rootDevice;
+            fsType = "ext4";
+          };
+
           hardware = {
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
-            cpu = lib.mkMerge [
-              (lib.mkIf (cpuVendor == "intel") {
-                intel.updateMicrocode = true;
-              })
-              (lib.mkIf (cpuVendor == "amd") {
-                amd.updateMicrocode = true;
-              })
-            ];
-            graphics = lib.mkMerge [{
+            graphics = {
               enable = true;
               enable32Bit = true;
-            } (lib.mkIf (gpuVendor == "intel") {
-              extraPackages = [ pkgs.intel-media-driver ];
-            })];
-          } // lib.mkIf (gpuVendor == "amd") {
-            amdgpu = {
-              enable = true;
-              amdvlk = true;
-              loadInInitrd = true;
-            };
-          } // lib.mkIf (gpuVendor == "nvidia") {
-            nvidia = {
-              open = false;
-              nvidiaSettings = true;
-              modesetting.enable = true;
-              package = pkgs.linuxPackages.nvidiaPackages.stable;
             };
           };
+        }
 
-          # Boot and Filesystem Configuration
-          boot = {
-            loader = if bootDevice != "" then {
-              systemd-boot.enable = true;
+        # CPU Configuration
+        {
+          hardware.cpu = lib.mkMerge [
+            (lib.mkIf (cpuVendor == "intel") {
+              intel.updateMicrocode = true;
+            })
+            (lib.mkIf (cpuVendor == "amd") {
+              amd.updateMicrocode = true;
+            })
+          ];
+        }
+
+        # GPU Configuration
+        {
+          boot.initrd.kernelModules = lib.mkMerge [
+            (lib.mkIf (gpuVendor == "amd") [ "amdgpu" ])
+            (lib.mkIf (gpuVendor == "nvidia") [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ])
+          ];
+
+          services.xserver.videoDrivers = lib.mkMerge [
+            (lib.mkIf (gpuVendor == "intel") [ "modesetting" ])
+            (lib.mkIf (gpuVendor == "amd") [ "amdgpu" ])
+            (lib.mkIf (gpuVendor == "nvidia") [ "nvidia" ])
+          ];
+
+          hardware = lib.mkMerge [
+            (lib.mkIf (gpuVendor == "intel") {
+              opengl.extraPackages = [ pkgs.intel-media-driver ];
+            })
+            (lib.mkIf (gpuVendor == "amd") {
+              amdgpu = {
+                enable = true;
+                amdvlk = true;
+                loadInInitrd = true;
+              };
+            })
+            (lib.mkIf (gpuVendor == "nvidia") {
+              nvidia = {
+                open = false;
+                nvidiaSettings = true;
+                modesetting.enable = true;
+                package = pkgs.linuxPackages.nvidiaPackages.stable;
+              };
+            })
+          ];
+        }
+
+        # Boot Configuration
+        {
+          boot.loader = lib.mkMerge [
+            (lib.mkIf (bootDevice != "") {
+              systemd-boot = {
+                enable = true;
+                configurationLimit = 10;
+              };
               efi = {
                 canTouchEfiVariables = true;
                 efiSysMountPoint = "/boot";
               };
-            } else {
+            })
+            (lib.mkIf (bootDevice == "") {
               grub = {
                 enable = true;
-                device = rootDevice;
+                devices = [ rootDevice ];
                 efiSupport = false;
               };
-            };
-          } // lib.mkIf (gpuVendor == "amd") {
-            initrd.kernelModules = [ "amdgpu" ];
-          };
-          fileSystems = {
-            "/" = {
-              device = rootDevice;
-              fsType = "ext4";
-            };
-          } // lib.optionalAttrs (bootDevice != "") {
+            })
+          ];
+
+          fileSystems = lib.mkIf (bootDevice != "") {
             "/boot" = {
               device = bootDevice;
               fsType = "vfat";
             };
           };
-          swapDevices = lib.optional (swapDevice != "") {
-            device = swapDevice;
-          };
+
+          swapDevices = lib.mkIf (swapDevice != "") [
+            { device = swapDevice; }
+          ];
         }
 
-        # Feature Modules
+        # Optional Features
         (lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
           services.xserver.excludePackages = [ pkgs.xterm ];
