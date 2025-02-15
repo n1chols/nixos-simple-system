@@ -73,24 +73,23 @@
             graphics = {
               enable = true;
               enable32Bit = true;
-              extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [ "intel-media-driver" ];
+              extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [ 
+                nixpkgs.legacyPackages.${systemType}.intel-media-driver 
+              ];
             };
-            nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
-              nvidia = {
-                nvidiaSettings = true;
-                modesetting.enable = true;
-                open = false;
-                package = nixpkgs.legacyPackages.${systemType}.linuxPackages.nvidiaPackages.stable;
-              };
+            nvidia = nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
+              nvidiaSettings = true;
+              modesetting.enable = true;
+              open = false;
+              package = nixpkgs.legacyPackages.${systemType}.linuxPackages.nvidiaPackages.stable;
             };
-            nixpkgs.lib.mkIf (gpuVendor == "amd") {
-              amdgpu = {
-                enable = true;
-                amdvlk = true;
-                loadInInitrd = true;
-              };
-            }
+            amdgpu = nixpkgs.lib.mkIf (gpuVendor == "amd") {
+              enable = true;
+              amdvlk = true;
+              loadInInitrd = true;
+            };
           };
+
           boot = {
             loader = if bootDevice != "" then {
               systemd-boot.enable = true;
