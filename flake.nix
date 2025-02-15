@@ -102,7 +102,7 @@
             };
           };
           fileSystems = {
-            "/" = nixpkgs.lib.mkIf (rootDevice != "") {
+            "/" = {
               device = rootDevice;
               fsType = "ext4";
             };
