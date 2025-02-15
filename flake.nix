@@ -70,28 +70,26 @@
                 amd.updateMicrocode = true;
               })
             ];
-            gpu = nixpkgs.lib.mkMerge [
-              (nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
-                nvidia = {
-                  nvidiaSettings = true;
-                  modesetting.enable = true;
-                  open = false;
-                  package = nixpkgs.legacyPackages.${systemType}.linuxPackages.nvidiaPackages.stable;
-                };
-              })
-              (nixpkgs.lib.mkIf (gpuVendor == "amd") {
-                amdgpu = {
-                  enable = true;
-                  amdvlk = true;
-                  loadInInitrd = true;
-                };
-              })
-            ];
             graphics = {
               enable = true;
               enable32Bit = true;
               extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [ "intel-media-driver" ];
             };
+            nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
+              nvidia = {
+                nvidiaSettings = true;
+                modesetting.enable = true;
+                open = false;
+                package = nixpkgs.legacyPackages.${systemType}.linuxPackages.nvidiaPackages.stable;
+              };
+            };
+            nixpkgs.lib.mkIf (gpuVendor == "amd") {
+              amdgpu = {
+                enable = true;
+                amdvlk = true;
+                loadInInitrd = true;
+              };
+            }
           };
           boot = {
             loader = if bootDevice != "" then {
