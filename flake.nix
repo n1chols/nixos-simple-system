@@ -32,7 +32,7 @@
       # Extra modules
       extraModules ? []
     }: 
-    lib.nixosSystem {
+    nixpkgs.lib.nixosSystem {
       system = systemType;
       modules = [
         {
