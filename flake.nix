@@ -76,12 +76,14 @@
             } (nixpkgs.lib.mkIf (gpuVendor == "intel") {
               extraPackages = [ nixpkgs.legacyPackages.${systemType}.intel-media-driver ];
             })];
-            amdgpu = nixpkgs.lib.mkIf (gpuVendor == "amd") {
+          } // nixpkgs.lib.mkIf (gpuVendor == "amd") {
+            amdgpu = {
               enable = true;
               amdvlk = true;
               loadInInitrd = true;
             };
-            nvidia = nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
+          } // nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
+            nvidia = {
               open = false;
               nvidiaSettings = true;
               modesetting.enable = true;
