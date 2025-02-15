@@ -70,7 +70,6 @@
                 amd.updateMicrocode = true;
               })
             ];
-
             gpu = nixpkgs.lib.mkMerge [
               (nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
                 nvidia = {
@@ -89,7 +88,6 @@
               })
             ];
           };
-
           graphics = {
             enable = true;
             enable32Bit = true;
@@ -98,7 +96,6 @@
                 intel-media-driver
               ]);
           };
-
           boot = {
             loader = if bootDevice != "" then {
               systemd-boot.enable = true;
@@ -111,7 +108,6 @@
               };
             };
           };
-
           fileSystems = {
             "/" = nixpkgs.lib.mkIf (rootDevice != "") {
               device = rootDevice;
@@ -123,7 +119,6 @@
               fsType = "vfat";
             };
           };
-
           swapDevices = nixpkgs.lib.optional (swapDevice != "") {
             device = swapDevice;
           };
