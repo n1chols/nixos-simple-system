@@ -92,7 +92,7 @@
             enable = true;
             enable32Bit = true;
             extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [
-              intel-media-driver
+              pkgs.intel-media-driver
             ];
           };
           boot = {
