@@ -1,7 +1,7 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   outputs = { self, nixpkgs }: {
-    mkSystem = {
+    nixosSystem = {
       # System
       hostName ? "nixos",
       userName ? "user",
@@ -45,7 +45,7 @@
             warn-dirty = false;
           };
         }
-      ];
+      ] ++ extraModules;
     };
   };
 }
