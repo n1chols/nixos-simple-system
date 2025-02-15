@@ -20,14 +20,14 @@ swapDevice # default: null
 
 #### Features
 ```python
-disableNixApps # default: true   Disable unnecessary inlcuded packages
-animateStartup # default: true   Enable boot loading animation
-autoUpdate     # default: true   Periodically update packages
-gamingTweaks   # default: false  Enable gaming-related optimizations
-hiResAudio     # default: false  Enable Hi-res audio
-dualBoot       # default: false  Support dual booting other OSes
-bluetooth      # default: false  Enable bluetooth service
-printing       # default: false  Enable printing support
-touchpad       # default: false  Enable touchpad support
-battery        # default: false  Enable battery management
+disableNixApps # default: true
+animateStartup # default: true
+autoUpdate     # default: true
+gamingTweaks   # default: false
+hiResAudio     # default: false
+dualBoot       # default: false
+bluetooth      # default: false
+printing       # default: false
+touchpad       # default: false
+battery        # default: false
 ```
