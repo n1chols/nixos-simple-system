@@ -7,6 +7,7 @@
       userName ? "user",
       systemType ? "x86_64-linux",
       timeZone ? "America/Los_Angeles",
+      keyLayout ? "us",
 
       # Hardware
       cpuVendor ? "intel",
@@ -33,6 +34,7 @@
           system.stateVersion = "24.11";
           nixpkgs.config.allowUnfree = true;
           time.timeZone = timeZone;
+          console.keyMap = keyLayout;
           networking = {
             hostName = hostName;
             networkmanager.enable = true;
@@ -55,14 +57,18 @@
             gpu = nixpkgs.lib.mkMerge [
               (nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
                 nvidia = {
+                  nvidiaSettings = true;
                   modesetting.enable = true;
                   open = false;
-                  nvidiaSettings = true;
                   package = config.boot.kernelPackages.nvidiaPackages.stable;
                 };
               })
               (nixpkgs.lib.mkIf (gpuVendor == "amd") {
-                amdgpu.enable = true;
+                amdgpu = {
+                  enable = true;
+                  amdvlk = true;
+                  loadInInitrd = true;
+                };
               })
             ];
           };
