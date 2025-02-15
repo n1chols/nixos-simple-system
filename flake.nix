@@ -20,7 +20,7 @@
       # Features
       disableNixApps ? true,
       animateStartup ? true,
-      autoUpdate ? true,
+      autoUpgrade ? true,
       gamingTweaks ? false,
       hiResAudio ? false,
       dualBoot ? false,
