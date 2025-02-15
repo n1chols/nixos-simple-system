@@ -74,7 +74,7 @@
                   nvidiaSettings = true;
                   modesetting.enable = true;
                   open = false;
-                  package = config.boot.kernelPackages.nvidiaPackages.stable;
+                  package = nixpkgs.linuxPackages.nvidiaPackages.stable;
                 };
               })
               (nixpkgs.lib.mkIf (gpuVendor == "amd") {
@@ -90,9 +90,10 @@
           graphics = {
             enable = true;
             enable32Bit = true;
-            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") with nixpkgs; [
-              intel-media-driver
-            ];
+            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") 
+              (with nixpkgs; [
+                intel-media-driver
+              ]);
           };
 
           boot = {
