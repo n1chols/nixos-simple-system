@@ -52,10 +52,41 @@
                 amd.updateMicrocode = true;
               })
             ];
+            gpu = nixpkgs.lib.mkMerge [
+              (nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
+                nvidia = {
+                  modesetting.enable = true;
+                  open = false;
+                  nvidiaSettings = true;
+                  package = config.boot.kernelPackages.nvidiaPackages.stable;
+                };
+              })
+              (nixpkgs.lib.mkIf (gpuVendor == "amd") {
+                amdgpu.enable = true;
+              })
+            ];
           };
           graphics = {
             enable = true;
             enable32Bit = true;
+            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") with pkgs; [
+              intel-media-driver
+              vaapiIntel
+              vaapiVdpau
+              libvdpau-va-gl
+            ];
+          };
+          boot = {
+            loader = if bootDevice != "" then {
+              systemd-boot.enable = true;
+              efi.canTouchEfiVariables = true;
+            } else {
+              grub = {
+                enable = true;
+                device = rootDevice;
+                efiSupport = false;
+              };
+            };
           };
           fileSystems = {
             "/" = nixpkgs.lib.mkIf (rootDevice != "") {
@@ -70,18 +101,6 @@
           };
           swapDevices = nixpkgs.lib.optional (swapDevice != "") {
             device = swapDevice;
-          };
-          boot = {
-            loader = if bootDevice != "" then {
-              systemd-boot.enable = true;
-              efi.canTouchEfiVariables = true;
-            } else {
-              grub = {
-                enable = true;
-                device = rootDevice;
-                efiSupport = false;
-              };
-            };
           };
         }
         (nixpkgs.lib.mkIf disableNixApps {
