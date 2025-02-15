@@ -75,7 +75,7 @@
               enable32Bit = true;
             } (nixpkgs.lib.mkIf (gpuVendor == "intel") {
               extraPackages = [ nixpkgs.legacyPackages.${systemType}.intel-media-driver ];
-            });
+            })];
           };
           boot = {
             loader = if bootDevice != "" then {
