@@ -95,15 +95,19 @@
           };
 
           # Boot and Filesystem Configuration
-          boot.loader = if bootDevice != "" then {
-            systemd-boot.enable = true;
-            efi.canTouchEfiVariables = true;
-          } else {
-            grub = {
-              enable = true;
-              device = rootDevice;
-              efiSupport = false;
+          boot = {
+            loader = if bootDevice != "" then {
+              systemd-boot.enable = true;
+              efi.canTouchEfiVariables = true;
+            } else {
+              grub = {
+                enable = true;
+                device = rootDevice;
+                efiSupport = false;
+              };
             };
+          } // lib.mkIf (gpuVendor == "amd") {
+            initrd.kernelModules = [ "amdgpu" ];
           };
           fileSystems = {
             "/" = {
