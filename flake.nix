@@ -62,7 +62,7 @@
           hardware = {
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
-            cpu = lib.mkMerge [
+            cpu = nixpkgs.lib.mkMerge [
               (nixpkgs.lib.mkIf (cpuVendor == "intel") {
                 intel.updateMicrocode = true;
               })
@@ -70,7 +70,7 @@
                 amd.updateMicrocode = true;
               })
             ];
-            gpu = lib.mkMerge [
+            gpu = nixpkgs.lib.mkMerge [
               (nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
                 nvidia = {
                   nvidiaSettings = true;
