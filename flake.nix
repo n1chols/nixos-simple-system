@@ -87,11 +87,11 @@
                 };
               })
             ];
-          };
-          graphics = {
-            enable = true;
-            enable32Bit = true;
-            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [ "intel-media-driver" ];
+            graphics = {
+              enable = true;
+              enable32Bit = true;
+              extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [ "intel-media-driver" ];
+            };
           };
           boot = {
             loader = if bootDevice != "" then {
