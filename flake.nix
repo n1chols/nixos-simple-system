@@ -108,17 +108,17 @@
             };
           };
           fileSystems = {
-            "/" = lib.mkIf (rootDevice != "") {
+            "/" = nixpkgs.lib.mkIf (rootDevice != "") {
               device = rootDevice;
               fsType = "ext4";
             };
-          } // lib.optionalAttrs (bootDevice != "") {
+          } // nixpkgs.lib.optionalAttrs (bootDevice != "") {
             "/boot" = {
               device = bootDevice;
               fsType = "vfat";
             };
           };
-          swapDevices = lib.optional (swapDevice != "") {
+          swapDevices = nixpkgs.lib.optional (swapDevice != "") {
             device = swapDevice;
           };
         }
