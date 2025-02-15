@@ -81,11 +81,8 @@
           graphics = {
             enable = true;
             enable32Bit = true;
-            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") with pkgs; [
+            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") with nixpkgs; [
               intel-media-driver
-              vaapiIntel
-              vaapiVdpau
-              libvdpau-va-gl
             ];
           };
           boot = {
