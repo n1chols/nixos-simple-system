@@ -7,6 +7,7 @@
       userName ? "user",
       systemType ? "x86_64-linux",
       timeZone ? "America/Los_Angeles",
+      locale ? "en_US.UTF-8";
       keyLayout ? "us",
 
       # Hardware
@@ -32,15 +33,19 @@
       system = systemType;
       modules = [
         {
+          # Nix Config
           system.stateVersion = "24.11";
           nixpkgs.config.allowUnfree = true;
-          time.timeZone = timeZone;
-          console.keyMap = keyLayout;
           nix.settings = {
             experimental-features = [ "nix-command" "flakes" ];
             auto-optimise-store = true;
             warn-dirty = false;
           };
+
+          # System Config
+          time.timeZone = timeZone;
+          i18n.defaultLocale = locale;
+          console.keyMap = keyLayout;
           networking = {
             hostName = hostName;
             networkmanager.enable = true;
@@ -49,6 +54,8 @@
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
           };
+
+          # Hardware Config
           hardware = {
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
@@ -60,6 +67,7 @@
                 amd.updateMicrocode = true;
               })
             ];
+
             gpu = nixpkgs.lib.mkMerge [
               (nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
                 nvidia = {
@@ -78,6 +86,7 @@
               })
             ];
           };
+
           graphics = {
             enable = true;
             enable32Bit = true;
@@ -85,6 +94,7 @@
               intel-media-driver
             ];
           };
+
           boot = {
             loader = if bootDevice != "" then {
               systemd-boot.enable = true;
@@ -97,6 +107,7 @@
               };
             };
           };
+
           fileSystems = {
             "/" = nixpkgs.lib.mkIf (rootDevice != "") {
               device = rootDevice;
@@ -108,6 +119,7 @@
               fsType = "vfat";
             };
           };
+
           swapDevices = nixpkgs.lib.optional (swapDevice != "") {
             device = swapDevice;
           };
