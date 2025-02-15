@@ -134,13 +134,13 @@
             theme = "spinner";
           };
         })
-        (nixpkgs.lib.mkIf autoUpgrade {
-          system.autoUpgrade = {
-            enable = true;
-            allowReboot = false;
-            dates = "04:00";
-          };
-        })
+        #(nixpkgs.lib.mkIf autoUpgrade {
+        #  system.autoUpgrade = {
+        #    enable = true;
+        #    allowReboot = false;
+        #    dates = "04:00";
+        #  };
+        #})
         (nixpkgs.lib.mkIf gamingTweaks {
           boot = {
             kernelPackages = nixpkgs.linuxPackages_xanmod;
