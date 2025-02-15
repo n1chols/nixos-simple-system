@@ -37,7 +37,7 @@
           time.timeZone = timeZone;
           console.keyMap = keyLayout;
           nix.settings = {
-            experimental-features = [ "flakes" ];
+            experimental-features = [ "nix-command" "flakes" ];
             auto-optimise-store = true;
             warn-dirty = false;
           };
