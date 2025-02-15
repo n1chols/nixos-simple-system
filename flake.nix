@@ -7,7 +7,7 @@
       userName ? "user",
       systemType ? "x86_64-linux",
       timeZone ? "America/Los_Angeles",
-      locale ? "en_US.UTF-8";
+      locale ? "en_US.UTF-8",
       keyLayout ? "us",
 
       # Hardware
