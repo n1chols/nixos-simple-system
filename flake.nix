@@ -124,7 +124,7 @@
         }
         (nixpkgs.lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
-          services.xserver.excludePackages = [ pkgs.xterm ];
+          services.xserver.excludePackages = [ nixpkgs.xterm ];
           environment.defaultPackages = [];
         })
         (nixpkgs.lib.mkIf animateStartup {
@@ -142,7 +142,7 @@
         })
         (nixpkgs.lib.mkIf gamingTweaks {
           boot = {
-            kernelPackages = pkgs.linuxPackages_xanmod;
+            kernelPackages = nixpkgs.linuxPackages_xanmod;
             kernel.sysctl = {
               "vm.swappiness" = 10;
               "vm.vfs_cache_pressure" = 50;
