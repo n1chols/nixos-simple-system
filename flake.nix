@@ -54,7 +54,7 @@
           console.keyMap = keyboardLayout;
           networking = {
             networkmanager.enable = true;
-            useDHCP = true;
+            useDHCP = lib.mkDefault true;
             hostName = hostName;
           };
           users.users.${userName} = {
