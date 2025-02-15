@@ -27,7 +27,7 @@
       touchpad ? false,
       bluetooth ? false,
       printing ? false,
-      battery ? false
+      battery ? false,
 
       # Extra modules
       extraModules ? []
