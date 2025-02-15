@@ -73,7 +73,9 @@
             graphics = {
               enable = true;
               enable32Bit = true;
-              extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [ "intel-media-driver" ];
+              extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [ 
+                nixpkgs.legacyPackages.${systemType}.intel-media-driver 
+              ];
             };
             amdgpu = nixpkgs.lib.mkIf (gpuVendor == "amd") {
               enable = true;
