@@ -1,6 +1,6 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-  outputs = { config, lib, pkgs, ... }: {
+  outputs = { self, nixpkgs }: {
     mkSystem = {
       # System
       hostName ? "nixos",
@@ -38,7 +38,7 @@
         {
           # Nix Config
           system.stateVersion = "24.11";
-          config.allowUnfree = true;
+          nixpkgs.config.allowUnfree = true;
           nix.settings = {
             experimental-features = [ "nix-command" "flakes" ];
             auto-optimise-store = true;
@@ -63,23 +63,23 @@
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
             cpu = lib.mkMerge [
-              (lib.mkIf (cpuVendor == "intel") {
+              (nixpkgs.lib.mkIf (cpuVendor == "intel") {
                 intel.updateMicrocode = true;
               })
-              (lib.mkIf (cpuVendor == "amd") {
+              (nixpkgs.lib.mkIf (cpuVendor == "amd") {
                 amd.updateMicrocode = true;
               })
             ];
             gpu = lib.mkMerge [
-              (lib.mkIf (gpuVendor == "nvidia") {
+              (nixpkgs.lib.mkIf (gpuVendor == "nvidia") {
                 nvidia = {
                   nvidiaSettings = true;
                   modesetting.enable = true;
                   open = false;
-                  package = pkgs.linuxPackages.nvidiaPackages.stable;
+                  package = nixpkgs.linuxPackages.nvidiaPackages.stable;
                 };
               })
-              (lib.mkIf (gpuVendor == "amd") {
+              (nixpkgs.lib.mkIf (gpuVendor == "amd") {
                 amdgpu = {
                   enable = true;
                   amdvlk = true;
@@ -91,8 +91,8 @@
           graphics = {
             enable = true;
             enable32Bit = true;
-            extraPackages = lib.mkIf (gpuVendor == "intel") [
-              pkgs.intel-media-driver
+            extraPackages = nixpkgs.lib.mkIf (gpuVendor == "intel") [
+              nixpkgs.intel-media-driver
             ];
           };
           boot = {
@@ -122,25 +122,25 @@
             device = swapDevice;
           };
         }
-        (lib.mkIf disableNixApps {
+        (nixpkgs.lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
           services.xserver.excludePackages = [ pkgs.xterm ];
           environment.defaultPackages = [];
         })
-        (lib.mkIf animateStartup {
+        (nixpkgs.lib.mkIf animateStartup {
           boot.plymouth = {
             enable = true;
             theme = "spinner";
           };
         })
-        (lib.mkIf autoUpgrade {
+        (nixpkgs.lib.mkIf autoUpgrade {
           system.autoUpgrade = {
             enable = true;
             allowReboot = false;
             dates = "04:00";
           };
         })
-        (lib.mkIf gamingTweaks {
+        (nixpkgs.lib.mkIf gamingTweaks {
           boot = {
             kernelPackages = pkgs.linuxPackages_xanmod;
             kernel.sysctl = {
@@ -154,7 +154,7 @@
             ];
           };
         })
-        (lib.mkIf hiResAudio {
+        (nixpkgs.lib.mkIf hiResAudio {
           hardware.pulseaudio.enable = false;
           security.rtkit.enable = true;
           services.pipewire = {
@@ -169,11 +169,11 @@
             };
           };
         })
-        (lib.mkIf dualBoot {
+        (nixpkgs.lib.mkIf dualBoot {
           time.hardwareClockInLocalTime = true;
           boot.loader.grub.useOSProber = true;
         })
-        (lib.mkIf touchpad {
+        (nixpkgs.lib.mkIf touchpad {
           services.xserver.libinput = {
             enable = true;
             touchpad = {
@@ -182,14 +182,14 @@
             };
           };
         })
-        (lib.mkIf bluetooth {
+        (nixpkgs.lib.mkIf bluetooth {
           hardware.bluetooth = {
             enable = true;
             powerOnBoot = true;
           };
           services.blueman.enable = true;
         })
-        (lib.mkIf printing {
+        (nixpkgs.lib.mkIf printing {
           services.printing.enable = true;
           services.avahi = {
             enable = true;
@@ -197,7 +197,7 @@
             openFirewall = true;
           };
         })
-        (lib.mkIf battery {
+        (nixpkgs.lib.mkIf battery {
           services.tlp.enable = true;
           services.upower.enable = true;
         })
