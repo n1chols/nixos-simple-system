@@ -99,7 +99,10 @@
           boot = {
             loader = if bootDevice != "" then {
               systemd-boot.enable = true;
-              efi.canTouchEfiVariables = true;
+              efi = {
+                canTouchEfiVariables = true;
+                efiSysMountPoint = "/boot";
+              };
             } else {
               grub = {
                 enable = true;
