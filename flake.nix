@@ -1,223 +1,237 @@
 {
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-  outputs = { self, nixpkgs }: {
-    nixosSystem = {
-      # Parameters stay the same...
-    }: 
-    let
-      lib = nixpkgs.lib;
-      pkgs = nixpkgs.legacyPackages.${systemType};
-    in lib.nixosSystem {
-      system = systemType;
-      modules = [
-        # Mandatory base configuration
-        {
-          system.stateVersion = "24.11";
-          nixpkgs.config.allowUnfree = true;
-          nix.settings = {
-            experimental-features = [ "nix-command" "flakes" ];
-            auto-optimise-store = true;
-            warn-dirty = false;
-          };
+ inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+ outputs = { self, nixpkgs }: {
+   nixosSystem = {
+     # System Configuration
+     hostName ? "nixos",
+     userName ? "user",
+     systemType ? "x86_64-linux", 
+     timeZone ? "America/Los_Angeles",
+     locale ? "en_US.UTF-8",
+     keyboardLayout ? "us",
 
-          time.timeZone = timeZone;
-          i18n.defaultLocale = locale;
-          console.keyMap = keyboardLayout;
-          networking = {
-            networkmanager.enable = true;
-            useDHCP = lib.mkDefault true;
-            hostName = hostName;
-          };
-          users.users.${userName} = {
-            isNormalUser = true;
-            extraGroups = [ "wheel" "networkmanager" ];
-          };
+     # Hardware Configuration
+     cpuVendor ? "intel",
+     gpuVendor ? "intel",
+     rootDevice ? "/dev/sda",
+     bootDevice ? null,
+     swapDevice ? null,
 
-          fileSystems."/" = {
-            device = rootDevice;
-            fsType = "ext4";
-          };
+     # Feature Flags
+     disableNixApps ? true,
+     animateStartup ? true,
+     autoUpgrade ? true,
+     gamingTweaks ? false,
+     hiResAudio ? false,
+     dualBoot ? false,
+     touchpad ? false,
+     bluetooth ? false,
+     printing ? false,
+     battery ? false,
 
-          hardware = {
-            enableAllFirmware = true;
-            enableRedistributableFirmware = true;
-            graphics = {
-              enable = true;
-              enable32Bit = true;
-            };
-          };
-        }
+     # Additional Configuration
+     extraModules ? []
+   }:
+   let
+     lib = nixpkgs.lib;
+     pkgs = nixpkgs.legacyPackages.${systemType};
+   in lib.nixosSystem {
+     system = systemType;
+     modules = [
+       # Mandatory base configuration
+       {
+         system.stateVersion = "24.11";
+         
+         nixpkgs.config.allowUnfree = true;
+         nix.settings = {
+           experimental-features = [ "nix-command" "flakes" ];
+           auto-optimise-store = true;
+           warn-dirty = false;
+         };
 
-        # CPU Configuration
-        {
-          hardware.cpu = lib.mkMerge [
-            (lib.mkIf (cpuVendor == "intel") {
-              intel.updateMicrocode = true;
-            })
-            (lib.mkIf (cpuVendor == "amd") {
-              amd.updateMicrocode = true;
-            })
-          ];
-        }
+         time.timeZone = timeZone;
+         i18n.defaultLocale = locale;
+         console.keyMap = keyboardLayout;
+         
+         networking = {
+           networkmanager.enable = true;
+           useDHCP = lib.mkDefault true;
+           hostName = hostName;
+         };
+         
+         users.users.${userName} = {
+           isNormalUser = true;
+           extraGroups = [ "wheel" "networkmanager" ];
+         };
 
-        # GPU Configuration
-        {
-          boot.initrd.kernelModules = lib.mkMerge [
-            (lib.mkIf (gpuVendor == "amd") [ "amdgpu" ])
-            (lib.mkIf (gpuVendor == "nvidia") [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ])
-          ];
+         fileSystems."/" = {
+           device = rootDevice;
+           fsType = "ext4";
+         };
 
-          services.xserver.videoDrivers = lib.mkMerge [
-            (lib.mkIf (gpuVendor == "intel") [ "modesetting" ])
-            (lib.mkIf (gpuVendor == "amd") [ "amdgpu" ])
-            (lib.mkIf (gpuVendor == "nvidia") [ "nvidia" ])
-          ];
+         hardware = {
+           enableAllFirmware = true;
+           enableRedistributableFirmware = true;
+           graphics = {
+             enable = true;
+             enable32Bit = true;
+           };
+         };
+       }
 
-          hardware = lib.mkMerge [
-            (lib.mkIf (gpuVendor == "intel") {
-              opengl.extraPackages = [ pkgs.intel-media-driver ];
-            })
-            (lib.mkIf (gpuVendor == "amd") {
-              amdgpu = {
-                enable = true;
-                amdvlk = true;
-                loadInInitrd = true;
-              };
-            })
-            (lib.mkIf (gpuVendor == "nvidia") {
-              nvidia = {
-                open = false;
-                nvidiaSettings = true;
-                modesetting.enable = true;
-                package = pkgs.linuxPackages.nvidiaPackages.stable;
-              };
-            })
-          ];
-        }
+       # CPU Configurations
+       (lib.mkIf (cpuVendor == "intel") {
+         hardware.cpu.intel.updateMicrocode = true;
+       })
 
-        # Boot Configuration
-        {
-          boot.loader = lib.mkMerge [
-            (lib.mkIf (bootDevice != "") {
-              systemd-boot = {
-                enable = true;
-                configurationLimit = 10;
-              };
-              efi = {
-                canTouchEfiVariables = true;
-                efiSysMountPoint = "/boot";
-              };
-            })
-            (lib.mkIf (bootDevice == "") {
-              grub = {
-                enable = true;
-                devices = [ rootDevice ];
-                efiSupport = false;
-              };
-            })
-          ];
+       (lib.mkIf (cpuVendor == "amd") {
+         hardware.cpu.amd.updateMicrocode = true;
+       })
 
-          fileSystems = lib.mkIf (bootDevice != "") {
-            "/boot" = {
-              device = bootDevice;
-              fsType = "vfat";
-            };
-          };
+       # GPU Configurations
+       (lib.mkIf (gpuVendor == "intel") {
+         hardware.opengl.extraPackages = [ pkgs.intel-media-driver ];
+         services.xserver.videoDrivers = [ "modesetting" ];
+       })
 
-          swapDevices = lib.mkIf (swapDevice != "") [
-            { device = swapDevice; }
-          ];
-        }
+       (lib.mkIf (gpuVendor == "amd") {
+         hardware.amdgpu = {
+           enable = true;
+           amdvlk = true;
+           loadInInitrd = true;
+         };
+         boot.initrd.kernelModules = [ "amdgpu" ];
+         services.xserver.videoDrivers = [ "amdgpu" ];
+       })
 
-        # Optional Features
-        (lib.mkIf disableNixApps {
-          documentation.nixos.enable = false;
-          services.xserver.excludePackages = [ pkgs.xterm ];
-          environment.defaultPackages = [];
-        })
+       (lib.mkIf (gpuVendor == "nvidia") {
+         hardware.nvidia = {
+           open = false;
+           nvidiaSettings = true;
+           modesetting.enable = true;
+           package = pkgs.linuxPackages.nvidiaPackages.stable;
+         };
+         boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+         services.xserver.videoDrivers = [ "nvidia" ];
+       })
 
-        (lib.mkIf animateStartup {
-          boot.plymouth = {
-            enable = true;
-            theme = "spinner";
-          };
-        })
+       # Boot Configurations
+       (lib.mkIf (bootDevice != null) {
+         boot.loader.systemd-boot = {
+           enable = true;
+           configurationLimit = 10;
+         };
+         boot.loader.efi = {
+           canTouchEfiVariables = true;
+           efiSysMountPoint = "/boot";
+         };
+         fileSystems."/boot" = {
+           device = bootDevice;
+           fsType = "vfat";
+         };
+       })
 
-        (lib.mkIf autoUpgrade {
-          system.autoUpgrade = {
-            enable = true;
-            allowReboot = false;
-            dates = "04:00";
-          };
-        })
+       (lib.mkIf (bootDevice == null) {
+         boot.loader.grub = {
+           enable = true;
+           devices = [ rootDevice ];
+           efiSupport = false;
+         };
+       })
 
-        (lib.mkIf gamingTweaks {
-          boot = {
-            kernelPackages = pkgs.linuxPackages_xanmod;
-            kernel.sysctl = {
-              "vm.swappiness" = 10;
-              "vm.vfs_cache_pressure" = 50;
-              "kernel.sched_autogroup_enabled" = 0;
-            };
-            kernelParams = [ "mitigations=off" "nowatchdog" ];
-          };
-        })
+       (lib.mkIf (swapDevice != null) {
+         swapDevices = [{ device = swapDevice; }];
+       })
 
-        (lib.mkIf hiResAudio {
-          services.pulseaudio.enable = false;
-          security.rtkit.enable = true;
-          services.pipewire = {
-            enable = true;
-            alsa.enable = true;
-            alsa.support32Bit = true;
-            pulse.enable = true;
-            extraConfig.pipewire = {
-              "context.properties" = {
-                "default.clock.allowed-rates" = [ 
-                  44100 48000 88200 96000 176400 192000 
-                ];
-              };
-            };
-          };
-        })
+       # Optional Features
+       (lib.mkIf disableNixApps {
+         documentation.nixos.enable = false;
+         services.xserver.excludePackages = [ pkgs.xterm ];
+         environment.defaultPackages = [];
+       })
 
-        (lib.mkIf dualBoot {
-          time.hardwareClockInLocalTime = true;
-          boot.loader.grub.useOSProber = true;
-        })
+       (lib.mkIf animateStartup {
+         boot.plymouth = {
+           enable = true;
+           theme = "spinner";
+         };
+       })
 
-        (lib.mkIf touchpad {
-          services.xserver.libinput = {
-            enable = true;
-            touchpad = {
-              tapping = true;
-              naturalScrolling = true;
-            };
-          };
-        })
+       (lib.mkIf autoUpgrade {
+         system.autoUpgrade = {
+           enable = true;
+           allowReboot = false;
+           dates = "04:00";
+         };
+       })
 
-        (lib.mkIf bluetooth {
-          hardware.bluetooth = {
-            enable = true;
-            powerOnBoot = true;
-          };
-          services.blueman.enable = true;
-        })
+       (lib.mkIf gamingTweaks {
+         boot = {
+           kernelPackages = pkgs.linuxPackages_xanmod;
+           kernel.sysctl = {
+             "vm.swappiness" = 10;
+             "vm.vfs_cache_pressure" = 50;
+             "kernel.sched_autogroup_enabled" = 0;
+           };
+           kernelParams = [ "mitigations=off" "nowatchdog" ];
+         };
+       })
 
-        (lib.mkIf printing {
-          services.printing.enable = true;
-          services.avahi = {
-            enable = true;
-            nssmdns4 = true;
-            openFirewall = true;
-          };
-        })
+       (lib.mkIf hiResAudio {
+         services.pulseaudio.enable = false;
+         security.rtkit.enable = true;
+         services.pipewire = {
+           enable = true;
+           alsa.enable = true;
+           alsa.support32Bit = true;
+           pulse.enable = true;
+           extraConfig.pipewire = {
+             "context.properties" = {
+               "default.clock.allowed-rates" = [ 
+                 44100 48000 88200 96000 176400 192000 
+               ];
+             };
+           };
+         };
+       })
 
-        (lib.mkIf battery {
-          services.tlp.enable = true;
-          services.upower.enable = true;
-        })
-      ] ++ extraModules;
-    };
-  };
+       (lib.mkIf dualBoot {
+         time.hardwareClockInLocalTime = true;
+         boot.loader.grub.useOSProber = true;
+       })
+
+       (lib.mkIf touchpad {
+         services.xserver.libinput = {
+           enable = true;
+           touchpad = {
+             tapping = true;
+             naturalScrolling = true;
+           };
+         };
+       })
+
+       (lib.mkIf bluetooth {
+         hardware.bluetooth = {
+           enable = true;
+           powerOnBoot = true;
+         };
+         services.blueman.enable = true;
+       })
+
+       (lib.mkIf printing {
+         services.printing.enable = true;
+         services.avahi = {
+           enable = true;
+           nssmdns4 = true;
+           openFirewall = true;
+         };
+       })
+
+       (lib.mkIf battery {
+         services.tlp.enable = true;
+         services.upower.enable = true;
+       })
+     ] ++ extraModules;
+   };
+ };
 }
