@@ -90,17 +90,15 @@
 
         # GPU Configurations
         (lib.mkIf (gpuVendor == "intel") {
-          hardware.opengl.extraPackages = [ pkgs.intel-media-driver ];
+          hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
           services.xserver.videoDrivers = [ "modesetting" ];
         })
 
         (lib.mkIf (gpuVendor == "amd") {
           hardware.amdgpu = {
-            enable = true;
             amdvlk.enable = true;
-            loadInInitrd = true;
+            initrd.enable = true;
           };
-          boot.initrd.kernelModules = [ "amdgpu" ];
           services.xserver.videoDrivers = [ "amdgpu" ];
         })
 
