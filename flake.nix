@@ -79,42 +79,6 @@
           };
         }
 
-        # CPU Configurations
-        (lib.mkIf (cpuVendor == "intel") {
-          hardware.cpu.intel.updateMicrocode = true;
-        })
-
-        (lib.mkIf (cpuVendor == "amd") {
-          hardware.cpu.amd.updateMicrocode = true;
-        })
-
-        # GPU Configurations
-        (lib.mkIf (gpuVendor == "intel") {
-          hardware.opengl.extraPackages = [ pkgs.intel-media-driver ];
-          services.xserver.videoDrivers = [ "modesetting" ];
-        })
-
-        (lib.mkIf (gpuVendor == "amd") {
-          hardware.amdgpu = {
-            enable = true;
-            amdvlk = true;
-            loadInInitrd = true;
-          };
-          boot.initrd.kernelModules = [ "amdgpu" ];
-          services.xserver.videoDrivers = [ "amdgpu" ];
-        })
-
-        (lib.mkIf (gpuVendor == "nvidia") {
-          hardware.nvidia = {
-            open = false;
-            nvidiaSettings = true;
-            modesetting.enable = true;
-            package = pkgs.linuxPackages.nvidiaPackages.stable;
-          };
-          boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
-          services.xserver.videoDrivers = [ "nvidia" ];
-        })
-
         # Boot Configurations
         (lib.mkIf (bootDevice != null) {
           boot.loader.systemd-boot = {
