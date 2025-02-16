@@ -95,7 +95,10 @@
         })
 
         (lib.mkIf (gpuVendor == "amd") {
-          hardware.amdgpu.initrd.enable = true;
+          hardware.amdgpu = {
+            initrd.enable = true;
+            amdvlk.enable = true;
+          };
           services.xserver.videoDrivers = [ "amdgpu" ];
         })
 
