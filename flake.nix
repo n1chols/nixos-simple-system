@@ -79,6 +79,15 @@
           };
         }
 
+        # CPU Configurations
+        (lib.mkIf (cpuVendor == "intel") {
+          hardware.cpu.intel.updateMicrocode = true;
+        })
+
+        (lib.mkIf (cpuVendor == "amd") {
+          hardware.cpu.amd.updateMicrocode = true;
+        })
+
         # Boot Configurations
         (lib.mkIf (bootDevice != null) {
           boot.loader.systemd-boot = {
