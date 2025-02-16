@@ -24,6 +24,7 @@
       gamingTweaks ? false,
       hiResAudio ? false,
       dualBoot ? false,
+      gamepad ? false,
       touchpad ? false,
       bluetooth ? false,
       printing ? false,
@@ -193,6 +194,10 @@
         (lib.mkIf dualBoot {
           time.hardwareClockInLocalTime = true;
           boot.loader.grub.useOSProber = true;
+        })
+
+        (lib.mkIf gamepad {
+          hardware.xpadneo.enable = true;
         })
 
         (lib.mkIf touchpad {
