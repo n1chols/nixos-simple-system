@@ -2,7 +2,7 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
   outputs = { self, nixpkgs }: {
-    default = args @ {
+    __functor = self: args @ {
       hostName ? "nixos",
       userName ? "user",
       systemType ? "x86_64-linux",
