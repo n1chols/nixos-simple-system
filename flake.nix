@@ -1,8 +1,6 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
   outputs = { self, nixpkgs }: let
-    # Define a function to generate a NixOS system configuration
     mkSystem = {
       hostName ? "nixos",
       userName ? "user",
