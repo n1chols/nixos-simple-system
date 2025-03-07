@@ -1,33 +1,33 @@
-## Config
-#### System
+### Usage Example
 ```python
-hostName   # default: nixos
-userName   # default: user
-systemType # default: x86_64-linux
-timeZone   # default: America/Los_Angeles
-locale     # default: en_US.UTF-8
-keyLayout  # default: us
-```
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    simple-system.url = "github:n1chols/nixos-simple-system";
+  };
 
-#### Hardware
-```python
-cpuVendor  # default: intel
-gpuVendor  # default: intel
-rootDevice # default: /dev/sda
-bootDevice # default: null
-swapDevice # default: null
-```
+  outputs = { nixpkgs, simple-system, ... }: {
+    nixosConfigurations.htpc = simple-system {
+      hostName = "htpc";
+      userName = "user";
 
-#### Features
-```python
-disableNixApps # default: true
-animateStartup # default: true
-autoUpdate     # default: true
-gamingTweaks   # default: false
-hiResAudio     # default: false
-dualBoot       # default: false
-bluetooth      # default: false
-printing       # default: false
-touchpad       # default: false
-battery        # default: false
+      cpuVendor = "amd";
+      gpuVendor = "amd";
+
+      bootDevice = "/dev/nvme0n1p1";
+      rootDevice = "/dev/nvme0n1p2";
+      swapDevice = "/dev/nvme0n1p3";
+
+      gamingTweaks = true;
+      hiResAudio = true;
+      gamepad = true;
+
+      extraModules = [
+        ./modules/steam.nix
+        ./modules/kodi.nix
+        ./modules/roon-server.nix
+      ];
+    };
+  };
+}
 ```
