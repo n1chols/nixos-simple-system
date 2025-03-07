@@ -32,7 +32,6 @@
     in nixpkgs.lib.nixosSystem {
       system = systemType;
       modules = [
-        # Mandatory base configuration
         ({ ... }: {
           system.stateVersion = "24.11";
           
@@ -73,7 +72,6 @@
           };
         })
 
-        # CPU Configurations
         (lib.mkIf (cpuVendor == "intel") {
           hardware.cpu.intel.updateMicrocode = true;
         })
@@ -82,7 +80,6 @@
           hardware.cpu.amd.updateMicrocode = true;
         })
 
-        # GPU Configurations
         (lib.mkIf (gpuVendor == "intel") {
           hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
           services.xserver.videoDrivers = [ "modesetting" ];
@@ -104,7 +101,6 @@
           services.xserver.videoDrivers = [ "nvidia" ];
         })
 
-        # Boot Configurations
         (lib.mkIf (bootDevice != null) {
           boot.loader.systemd-boot = {
             enable = true;
@@ -132,7 +128,6 @@
           swapDevices = [{ device = swapDevice; }];
         })
 
-        # Optional Features
         (lib.mkIf disableNixApps {
           documentation.nixos.enable = false;
           services.xserver.excludePackages = [ pkgs.xterm ];
