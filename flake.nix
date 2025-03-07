@@ -25,11 +25,13 @@
     printing ? false,
     battery ? false,
     extraModules ? []
-  }: nixpkgs.lib.nixosSystem {
+  }: let
+    lib = nixpkgs.lib;
+  in nixpkgs.lib.nixosSystem {
     system = systemType;
     modules = [
       # Mandatory base configuration
-      ({ pkgs, lib, ... }: {
+      ({ pkgs, ... }: {
         system.stateVersion = "24.11";
         
         nixpkgs.config.allowUnfree = true;
