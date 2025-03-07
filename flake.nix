@@ -227,7 +227,6 @@
         ] ++ extraModules;
       };
   in {
-    # Export the mkSystem function as part of the outputs set
     mkSystem = mkSystem;
   };
 }
