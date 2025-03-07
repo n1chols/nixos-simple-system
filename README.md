@@ -1,5 +1,5 @@
 ## Usage Example
-```python
+```nix
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
