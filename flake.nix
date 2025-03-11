@@ -29,7 +29,7 @@
     }: let
       lib = nixpkgs.lib;
       pkgs = nixpkgs.legacyPackages.${systemType};
-    in nixpkgs.lib.nixosSystem {
+    in lib.nixosSystem {
       system = systemType;
       modules = [
         ({ ... }: {
