@@ -23,9 +23,9 @@
       gamepad = true;
 
       extraModules = [
-        ./steam.nix
-        ./kodi.nix
-        ./roon-server.nix
+        ./modules/steam.nix
+        ./modules/kodi.nix
+        ./modules/roon-server.nix
       ];
     };
   };
