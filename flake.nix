@@ -24,7 +24,7 @@
       bluetooth ? false,
       printing ? false,
       battery ? false,
-      extraModules ? []
+      modules ? []
     }: let
       lib = nixpkgs.lib;
       pkgs = nixpkgs.legacyPackages.${systemType};
@@ -191,7 +191,7 @@
           services.tlp.enable = true;
           services.upower.enable = true;
         })
-      ] ++ extraModules;
+      ] ++ modules;
     };
   };
 }
