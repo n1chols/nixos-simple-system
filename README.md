@@ -6,7 +6,7 @@
     simple-system.url = "github:n1chols/nixos-simple-system";
   };
 
-  outputs = { nixpkgs, simple-system, ... }: {
+  outputs = { simple-system, ... }: {
     nixosConfigurations.htpc = simple-system {
       hostName = "htpc";
       userName = "user";
