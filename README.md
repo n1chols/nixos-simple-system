@@ -22,7 +22,7 @@
       hiResAudio = true;
       gamepad = true;
 
-      extraModules = [
+      modules = [
         ./modules/steam.nix
         ./modules/kodi.nix
         ./modules/roon-server.nix
