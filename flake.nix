@@ -14,7 +14,6 @@
       bootDevice ? null,
       swapDevice ? null,
       disableNixApps ? true,
-      animateStartup ? true,
       autoUpgrade ? true,
       gamingTweaks ? false,
       hiResAudio ? false,
@@ -116,12 +115,6 @@
           documentation.nixos.enable = false;
           services.xserver.excludePackages = [ pkgs.xterm ];
           environment.defaultPackages = [];
-        })
-        (lib.mkIf animateStartup {
-          boot.plymouth = {
-            enable = true;
-            theme = "spinner";
-          };
         })
         (lib.mkIf autoUpgrade {
           system.autoUpgrade = {
