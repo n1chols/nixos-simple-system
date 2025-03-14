@@ -102,16 +102,18 @@
           services.xserver.videoDrivers = [ "nvidia" ];
         })
         (lib.mkIf (bootDevice != null) {
-          # Enable systemd-boot
-          boot.loader.systemd-boot = {
-            enable = true;
-            configurationLimit = 10;
-          };
           # Enable EFI boot loader
-          boot.loader.efi = {
-            canTouchEfiVariables = true;
-            efiSysMountPoint = "/boot";
+          boot.loader = {
+            systemd-boot = {
+              enable = true;
+              configurationLimit = 10;
+            };
+            efi = {
+              canTouchEfiVariables = true;
+              efiSysMountPoint = "/boot";
+            };
           };
+
           # Specify filesystem boot device
           fileSystems."/boot" = {
             device = bootDevice;
