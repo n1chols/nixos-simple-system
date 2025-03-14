@@ -86,12 +86,10 @@
         (lib.mkIf (gpuVendor == "intel") {
           # Enable intel media driver
           hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
-          services.xserver.videoDrivers = [ "modesetting" ];
         })
         (lib.mkIf (gpuVendor == "amd") {
-          # Enable amdgpu driver
-          hardware.amdgpu.initrd.enable = true;
-          services.xserver.videoDrivers = [ "amdgpu" ];
+          # Enable kvm-amd driver
+          boot.kernelModules = [ "kvm-amd" ];
         })
         (lib.mkIf (gpuVendor == "nvidia") {
           # Enable nvidia driver
