@@ -14,10 +14,8 @@
       bootDevice ? null,
       swapDevice ? null,
       disableNixApps ? true,
-      autoUpgrade ? true,
       gamingTweaks ? false,
       hiResAudio ? false,
-      dualBoot ? false,
       gamepad ? false,
       touchpad ? false,
       bluetooth ? false,
@@ -31,29 +29,43 @@
       system = systemType;
       modules = [
         ({ ... }: {
+          # Set NixOS version
           system.stateVersion = "24.11";
+
+          # Allow unfree packages
           nixpkgs.config.allowUnfree = true;
+
+          # Enable flakes
           nix.settings = {
             experimental-features = [ "nix-command" "flakes" ];
-            auto-optimise-store = true;
             warn-dirty = false;
           };
+
+          # Set timezone, locale, and keyboard
           time.timeZone = timeZone;
           i18n.defaultLocale = locale;
           console.keyMap = keyboardLayout;
+
+          # Enable NetworkManager
           networking = {
             networkmanager.enable = true;
             useDHCP = lib.mkDefault true;
             hostName = hostName;
           };
+
+          # Create user
           users.users.${userName} = {
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
           };
+
+          # Specify filesystem root device
           fileSystems."/" = {
             device = rootDevice;
             fsType = "ext4";
           };
+
+          # Enable firmware and graphics
           hardware = {
             enableAllFirmware = true;
             enableRedistributableFirmware = true;
@@ -64,20 +76,25 @@
           };
         })
         (lib.mkIf (cpuVendor == "intel") {
+          # Enable updating cpu microcode
           hardware.cpu.intel.updateMicrocode = true;
         })
         (lib.mkIf (cpuVendor == "amd") {
+          # Enable updating cpu microcode
           hardware.cpu.amd.updateMicrocode = true;
         })
         (lib.mkIf (gpuVendor == "intel") {
+          # Enable intel media driver
           hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
           services.xserver.videoDrivers = [ "modesetting" ];
         })
         (lib.mkIf (gpuVendor == "amd") {
+          # Enable amdgpu driver
           hardware.amdgpu.initrd.enable = true;
           services.xserver.videoDrivers = [ "amdgpu" ];
         })
         (lib.mkIf (gpuVendor == "nvidia") {
+          # Enable nvidia driver
           hardware.nvidia = {
             open = false;
             nvidiaSettings = true;
@@ -88,20 +105,24 @@
           services.xserver.videoDrivers = [ "nvidia" ];
         })
         (lib.mkIf (bootDevice != null) {
+          # Enable systemd-boot
           boot.loader.systemd-boot = {
             enable = true;
             configurationLimit = 10;
           };
+          # Enable EFI boot loader
           boot.loader.efi = {
             canTouchEfiVariables = true;
             efiSysMountPoint = "/boot";
           };
+          # Specify filesystem boot device
           fileSystems."/boot" = {
             device = bootDevice;
             fsType = "vfat";
           };
         })
         (lib.mkIf (bootDevice == null) {
+          # Enable GRUB bootloader
           boot.loader.grub = {
             enable = true;
             devices = [ rootDevice ];
@@ -109,34 +130,25 @@
           };
         })
         (lib.mkIf (swapDevice != null) {
+          # Specify filesystem swap device
           swapDevices = [{ device = swapDevice; }];
         })
         (lib.mkIf disableNixApps {
+          # Disable documentation and xterm app
           documentation.nixos.enable = false;
           services.xserver.excludePackages = [ pkgs.xterm ];
+
+          # Remove NixOS default packages
           environment.defaultPackages = [];
         })
-        (lib.mkIf autoUpgrade {
-          system.autoUpgrade = {
-            enable = true;
-            allowReboot = false;
-            dates = "04:00";
-          };
-        })
-        (lib.mkIf gamingTweaks {
-          boot = {
-            kernelPackages = pkgs.linuxPackages_xanmod;
-            kernel.sysctl = {
-              "vm.swappiness" = 10;
-              "vm.vfs_cache_pressure" = 50;
-              "kernel.sched_autogroup_enabled" = 0;
-            };
-            kernelParams = [ "mitigations=off" "nowatchdog" ];
-          };
-        })
         (lib.mkIf hiResAudio {
+          # Disable PulseAudio
           services.pulseaudio.enable = false;
+
+          # Enable RTKit
           security.rtkit.enable = true;
+
+          # Enable PipeWire with sample rate switching
           services.pipewire = {
             enable = true;
             alsa.enable = true;
@@ -149,14 +161,28 @@
             };
           };
         })
-        (lib.mkIf dualBoot {
-          time.hardwareClockInLocalTime = true;
-          boot.loader.grub.useOSProber = true;
+        (lib.mkIf gamingTweaks {
+          boot = {
+            # Enable XanMod kernel
+            kernelPackages = pkgs.linuxPackages_xanmod;
+
+            # Apply kernel tweaks
+            kernel.sysctl = {
+              "vm.swappiness" = 10;
+              "vm.vfs_cache_pressure" = 50;
+              "kernel.sched_autogroup_enabled" = 0;
+            };
+
+            # Disable mitigations and watchdog
+            kernelParams = [ "mitigations=off" "nowatchdog" ];
+          };
         })
         (lib.mkIf gamepad {
+          # Enable xpadneo driver
           hardware.xpadneo.enable = true;
         })
         (lib.mkIf touchpad {
+          # Enable touchpad input
           services.xserver.libinput = {
             enable = true;
             touchpad = {
@@ -166,14 +192,17 @@
           };
         })
         (lib.mkIf bluetooth {
+          # Enable bluetooth driver
           hardware.bluetooth = {
             enable = true;
             powerOnBoot = true;
           };
-          services.blueman.enable = true;
         })
         (lib.mkIf printing {
+          # Enable printing service
           services.printing.enable = true;
+
+          # Enable printer autodiscovery
           services.avahi = {
             enable = true;
             nssmdns4 = true;
@@ -181,7 +210,10 @@
           };
         })
         (lib.mkIf battery {
+          # Enable tlp with defaults
           services.tlp.enable = true;
+
+          # Enable power management
           services.upower.enable = true;
         })
       ] ++ modules;
