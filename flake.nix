@@ -99,7 +99,6 @@
             modesetting.enable = true;
             package = pkgs.linuxPackages.nvidiaPackages.stable;
           };
-          boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
           services.xserver.videoDrivers = [ "nvidia" ];
         })
         (lib.mkIf (bootDevice != null) {
