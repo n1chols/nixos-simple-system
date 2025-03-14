@@ -14,12 +14,12 @@
       bootDevice ? null,
       swapDevice ? null,
       disableNixApps ? true,
-      gamingTweaks ? false,
       hiResAudio ? false,
+      gamingTweaks ? false,
       gamepad ? false,
-      touchpad ? false,
       bluetooth ? false,
       printing ? false,
+      touchpad ? false,
       battery ? false,
       modules ? []
     }: let
@@ -181,16 +181,6 @@
           # Enable xpadneo driver
           hardware.xpadneo.enable = true;
         })
-        (lib.mkIf touchpad {
-          # Enable touchpad input
-          services.xserver.libinput = {
-            enable = true;
-            touchpad = {
-              tapping = true;
-              naturalScrolling = true;
-            };
-          };
-        })
         (lib.mkIf bluetooth {
           # Enable bluetooth driver
           hardware.bluetooth = {
@@ -207,6 +197,16 @@
             enable = true;
             nssmdns4 = true;
             openFirewall = true;
+          };
+        })
+        (lib.mkIf touchpad {
+          # Enable touchpad input
+          services.xserver.libinput = {
+            enable = true;
+            touchpad = {
+              tapping = true;
+              naturalScrolling = true;
+            };
           };
         })
         (lib.mkIf battery {
