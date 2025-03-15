@@ -142,9 +142,6 @@
           environment.defaultPackages = [];
         })
         (lib.mkIf hiResAudio {
-          # Disable PulseAudio
-          services.pulseaudio.enable = false;
-
           # Enable RTKit
           security.rtkit.enable = true;
 
