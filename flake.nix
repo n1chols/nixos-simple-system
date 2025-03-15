@@ -91,6 +91,9 @@
         (lib.mkIf (gpuVendor == "amd") {
           # Enable kvm-amd driver
           boot.kernelModules = [ "kvm-amd" ];
+
+          # Enable amdgpu driver
+          services.xserver.videoDrivers = [ "amdgpu" ];
         })
         (lib.mkIf (gpuVendor == "nvidia") {
           # Enable nvidia driver
