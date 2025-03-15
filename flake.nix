@@ -89,11 +89,8 @@
           hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
         })
         (lib.mkIf (gpuVendor == "amd") {
-          # Enable kvm-amd driver
-          #boot.kernelModules = [ "kvm-amd" ];
-
-          # Load amdgpu driver early
-          boot.initrd.kernelModules = [ "amdgpu" ];
+          # Enable amdgpu and kvm-amd driver
+          boot.kernelModules = [ "amdgpu" "kvm-amd" ];
 
           # Enable amdgpu driver for xserver
           services.xserver.videoDrivers = [ "amdgpu" ];
