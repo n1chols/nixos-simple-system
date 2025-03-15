@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-stable";
   outputs = { self, nixpkgs }: {
     __functor = self: args @ {
       hostName ? "nixos",
@@ -8,12 +8,13 @@
       timeZone ? "America/Los_Angeles",
       locale ? "en_US.UTF-8",
       keyboardLayout ? "us",
+      stateVersion ? null,
       cpuVendor ? null,
       gpuVendor ? null,
       rootDevice ? null,
       bootDevice ? null,
       swapDevice ? null,
-      disableNixApps ? true,
+      disableNixApps ? false,
       hiResAudio ? false,
       gamingTweaks ? false,
       gamepad ? false,
@@ -29,8 +30,8 @@
       system = systemType;
       modules = [
         ({ ... }: {
-          # Set NixOS version
-          system.stateVersion = "24.11";
+          # Set NixOS state version
+          system.stateVersion = stateVersion;
 
           # Allow unfree packages
           nixpkgs.config.allowUnfree = true;
