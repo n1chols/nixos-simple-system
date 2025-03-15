@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/release-24.11";
   outputs = { self, nixpkgs }: {
     __functor = self: args @ {
       stateVersion ? null,
