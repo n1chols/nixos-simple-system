@@ -2,13 +2,13 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-stable";
   outputs = { self, nixpkgs }: {
     __functor = self: args @ {
+      stateVersion ? null,
       hostName ? "nixos",
       userName ? "user",
       systemType ? "x86_64-linux",
       timeZone ? "America/Los_Angeles",
       locale ? "en_US.UTF-8",
       keyboardLayout ? "us",
-      stateVersion ? null,
       cpuVendor ? null,
       gpuVendor ? null,
       rootDevice ? null,
