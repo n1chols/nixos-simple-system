@@ -90,9 +90,12 @@
         })
         (lib.mkIf (gpuVendor == "amd") {
           # Enable kvm-amd driver
-          boot.kernelModules = [ "kvm-amd" ];
+          #boot.kernelModules = [ "kvm-amd" ];
 
-          # Enable amdgpu driver
+          # Load amdgpu driver early
+          boot.initrd.kernelModules = [ "amdgpu" ];
+
+          # Enable amdgpu driver for xserver
           services.xserver.videoDrivers = [ "amdgpu" ];
         })
         (lib.mkIf (gpuVendor == "nvidia") {
