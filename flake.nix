@@ -14,7 +14,7 @@
       rootDevice ? null,
       bootDevice ? null,
       swapDevice ? null,
-      disableNixApps ? false,
+      disableNixApps ? true,
       hiResAudio ? false,
       gamingTweaks ? false,
       gamepad ? false,
