@@ -163,8 +163,8 @@
         })
         (lib.mkIf gamingTweaks {
           boot = {
-            # Enable XanMod kernel
-            kernelPackages = pkgs.linuxPackages_xanmod;
+            # Enable Zen kernel
+            kernelPackages = pkgs.linuxPackages_zen;
 
             # Apply kernel tweaks
             kernel.sysctl = {
