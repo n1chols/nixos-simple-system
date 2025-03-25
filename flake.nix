@@ -105,6 +105,14 @@
           };
           services.xserver.videoDrivers = [ "nvidia" ];
         })
+        (lib.mkIf (bootDevice == null) {
+          # Enable GRUB bootloader
+          boot.loader.grub = {
+            enable = true;
+            devices = [ rootDevice ];
+            efiSupport = false;
+          };
+        })
         (lib.mkIf (bootDevice != null) {
           # Enable EFI boot loader
           boot.loader = {
@@ -122,14 +130,6 @@
           fileSystems."/boot" = {
             device = bootDevice;
             fsType = "vfat";
-          };
-        })
-        (lib.mkIf (bootDevice == null) {
-          # Enable GRUB bootloader
-          boot.loader.grub = {
-            enable = true;
-            devices = [ rootDevice ];
-            efiSupport = false;
           };
         })
         (lib.mkIf (swapDevice != null) {
@@ -166,15 +166,15 @@
             # Enable Zen kernel
             kernelPackages = pkgs.linuxPackages_zen;
 
+            # Disable mitigations and watchdog
+            kernelParams = [ "mitigations=off" "nowatchdog" ];
+
             # Apply kernel tweaks
             kernel.sysctl = {
               "vm.swappiness" = 10;
               "vm.vfs_cache_pressure" = 50;
               "kernel.sched_autogroup_enabled" = 0;
             };
-
-            # Disable mitigations and watchdog
-            kernelParams = [ "mitigations=off" "nowatchdog" ];
           };
         })
         (lib.mkIf gamepad {
