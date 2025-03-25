@@ -22,6 +22,7 @@
       printing ? false,
       touchpad ? false,
       battery ? false,
+      packages ? [],
       modules ? []
     }: let
       lib = nixpkgs.lib;
@@ -75,6 +76,9 @@
               enable32Bit = true;
             };
           };
+
+          # Add system-wide packages
+          environment.systemPackages = packages;
         })
         (lib.mkIf (cpuVendor == "intel") {
           # Enable updating cpu microcode
