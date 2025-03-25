@@ -37,6 +37,9 @@
           # Allow unfree packages
           nixpkgs.config.allowUnfree = true;
 
+          # Add system packages
+          environment.systemPackages = packages;
+
           # Enable flakes
           nix.settings = {
             experimental-features = [ "nix-command" "flakes" ];
@@ -76,9 +79,6 @@
               enable32Bit = true;
             };
           };
-
-          # Add system-wide packages
-          environment.systemPackages = packages;
         })
         (lib.mkIf (cpuVendor == "intel") {
           # Enable updating cpu microcode
