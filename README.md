@@ -31,7 +31,7 @@
 
     shells = {
       python = {
-        packages = ps: with ps; [ python3 python.requests python.pandas python.black python.ipython ];
+        packages = [ python3 python.requests python.pandas python.black python.ipython ];
         hook = "echo 'Python version: $(python --version)'";
       };
       nodejs = {
