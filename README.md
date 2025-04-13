@@ -19,7 +19,7 @@
         swapDevice = "/dev/nvme0n1p3";
 
         audio = true;
-        gamepad = true;
+        bluetooth = true;
 
         modules = [
           ./modules/steam.nix
