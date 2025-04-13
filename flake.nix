@@ -15,8 +15,7 @@
       bootDevice ? null,
       swapDevice ? null,
       disableNixApps ? true,
-      hiResAudio ? false,
-      gamingTweaks ? false,
+      audio ? false,
       gamepad ? false,
       bluetooth ? false,
       printing ? false,
@@ -148,7 +147,7 @@
           # Remove NixOS default packages
           environment.defaultPackages = [];
         })
-        (lib.mkIf hiResAudio {
+        (lib.mkIf audio {
           # Enable RTKit
           security.rtkit.enable = true;
 
@@ -162,22 +161,6 @@
               "context.properties" = {
                 "default.clock.allowed-rates" = [ 44100 48000 88200 96000 176400 192000 ];
               };
-            };
-          };
-        })
-        (lib.mkIf gamingTweaks {
-          boot = {
-            # Enable Zen kernel
-            kernelPackages = pkgs.linuxPackages_zen;
-
-            # Disable mitigations and watchdog
-            kernelParams = [ "mitigations=off" "nowatchdog" ];
-
-            # Apply kernel tweaks
-            kernel.sysctl = {
-              "vm.swappiness" = 10;
-              "vm.vfs_cache_pressure" = 50;
-              "kernel.sched_autogroup_enabled" = 0;
             };
           };
         })
