@@ -7,10 +7,9 @@
   };
 
   outputs = { flake-simplex, ... }: {
+    stateVersion = "24.11";
     systems = {
       htpc = {
-        stateVersion = "24.11";
-
         cpuVendor = "amd";
         gpuVendor = "amd";
 
@@ -28,7 +27,6 @@
         ];
       };
     };
-
     shells = {
       python = {
         packages = [ python3 python.requests python.pandas python.black python.ipython ];
