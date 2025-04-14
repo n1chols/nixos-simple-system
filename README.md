@@ -29,7 +29,7 @@
     };
     shells = {
       python = {
-        packages = [ python3 python.requests python.pandas python.black python.ipython ];
+        packages = [ python3 ];
         hook = "echo 'Python version: $(python --version)'";
       };
       nodejs = {
