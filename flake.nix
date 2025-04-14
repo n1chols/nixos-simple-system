@@ -1,7 +1,25 @@
 {
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/release-24.11";
-  outputs = { self, nixpkgs }: {
-    __functor = self: args @ {
+  outputs = { nixpkgs }: {
+    __functor = self: outputs: let
+      inherit (outputs) stateVersion systems shells;
+      lib = nixpkgs.lib;
+    in outputs // {
+      nixosConfigurations = lib.mapAttrs
+        (hostName: cfg: self.system ({
+          inherit hostName stateVersion;
+          userName = "user";
+        } // cfg))
+        systems;
+
+      devShells.x86_64-linux = lib.mapAttrs
+        (name: cfg: self.devShell ({
+          name = name;
+          system = "x86_64-linux";
+        } // cfg))
+        shells;
+    };
+
+    system = {
       stateVersion ? null,
       hostName ? "nixos",
       userName ? "user",
@@ -204,6 +222,26 @@
           services.upower.enable = true;
         })
       ] ++ modules;
+    };
+
+    # DevShell: creates a development shell for a given system and name
+    devShell = {
+      system ? "x86_64-linux",
+      name,
+      packages ? [],
+      hook ? ""
+    }: let
+      pkgs = nixpkgs;
+      resolvedPackages = builtins.map (pkg:
+        if builtins.isString pkg
+        then pkgs.${pkg}
+        else pkg
+      ) packages;
+    in {
+      devShells.${system}.${name} = pkgs.mkShell {
+        packages = resolvedPackages;
+        shellHook = hook;
+      };
     };
   };
 }
