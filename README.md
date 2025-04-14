@@ -7,15 +7,16 @@
   };
 
   outputs = { flake-simplex, ... }: {
-    stateVersion = "24.11";
     systems = {
       htpc = {
-        cpuVendor = "amd";
-        gpuVendor = "amd";
+        stateVersion = "24.11";
 
         bootDevice = "/dev/nvme0n1p1";
         rootDevice = "/dev/nvme0n1p2";
         swapDevice = "/dev/nvme0n1p3";
+
+        cpuVendor = "amd";
+        gpuVendor = "amd";
 
         audio = true;
         bluetooth = true;
@@ -30,15 +31,11 @@
     shells = {
       python = {
         packages = [ python3 ];
-        hook = "echo 'Python version: $(python --version)'";
-      };
-      nodejs = {
-        packages = [ nodejs yarn ];
-        hook = "echo 'Node.js version: $(node --version)'";
+        hook = "python --version";
       };
       java = {
         packages = [ jdk maven ];
-        hook = "echo 'Java version: $(java --version)'";
+        hook = "java --version";
       };
     };
   };
