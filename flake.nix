@@ -8,11 +8,11 @@
       timeZone ? "America/Los_Angeles",
       locale ? "en_US.UTF-8",
       keyboardLayout ? "us",
-      cpuVendor ? null,
-      gpuVendor ? null,
       rootDevice ? null,
       bootDevice ? null,
       swapDevice ? null,
+      cpuVendor ? null,
+      gpuVendor ? null,
       audio ? false,
       gamepad ? false,
       bluetooth ? false,
@@ -84,35 +84,6 @@
             };
           };
         })
-        (lib.mkIf (cpuVendor == "intel") {
-          # Enable updating cpu microcode
-          hardware.cpu.intel.updateMicrocode = true;
-        })
-        (lib.mkIf (cpuVendor == "amd") {
-          # Enable updating cpu microcode
-          hardware.cpu.amd.updateMicrocode = true;
-        })
-        (lib.mkIf (gpuVendor == "intel") {
-          # Enable intel media driver
-          hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
-        })
-        (lib.mkIf (gpuVendor == "amd") {
-          # Enable amdgpu and kvm-amd driver
-          boot.kernelModules = [ "amdgpu" "kvm-amd" ];
-
-          # Enable amdgpu driver for xserver
-          services.xserver.videoDrivers = [ "amdgpu" ];
-        })
-        (lib.mkIf (gpuVendor == "nvidia") {
-          # Enable nvidia driver
-          hardware.nvidia = {
-            open = false;
-            nvidiaSettings = true;
-            modesetting.enable = true;
-            package = pkgs.linuxPackages.nvidiaPackages.stable;
-          };
-          services.xserver.videoDrivers = [ "nvidia" ];
-        })
         (lib.mkIf (bootDevice == null) {
           # Enable GRUB bootloader
           boot.loader.grub = {
@@ -143,6 +114,35 @@
         (lib.mkIf (swapDevice != null) {
           # Specify filesystem swap device
           swapDevices = [{ device = swapDevice; }];
+        })
+        (lib.mkIf (cpuVendor == "intel") {
+          # Enable updating cpu microcode
+          hardware.cpu.intel.updateMicrocode = true;
+        })
+        (lib.mkIf (cpuVendor == "amd") {
+          # Enable updating cpu microcode
+          hardware.cpu.amd.updateMicrocode = true;
+        })
+        (lib.mkIf (gpuVendor == "intel") {
+          # Enable intel media driver
+          hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
+        })
+        (lib.mkIf (gpuVendor == "amd") {
+          # Enable amdgpu and kvm-amd driver
+          boot.kernelModules = [ "amdgpu" "kvm-amd" ];
+
+          # Enable amdgpu driver for xserver
+          services.xserver.videoDrivers = [ "amdgpu" ];
+        })
+        (lib.mkIf (gpuVendor == "nvidia") {
+          # Enable nvidia driver
+          hardware.nvidia = {
+            open = false;
+            nvidiaSettings = true;
+            modesetting.enable = true;
+            package = pkgs.linuxPackages.nvidiaPackages.stable;
+          };
+          services.xserver.videoDrivers = [ "nvidia" ];
         })
         (lib.mkIf audio {
           # Enable RTKit
