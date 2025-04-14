@@ -1,25 +1,6 @@
 {
-  outputs = { nixpkgs }: {
-    __functor = self: outputs: let
-      inherit (outputs) stateVersion systems shells;
-      lib = nixpkgs.lib;
-    in outputs // {
-      nixosConfigurations = lib.mapAttrs
-        (hostName: cfg: self.system ({
-          inherit hostName stateVersion;
-          userName = "user";
-        } // cfg))
-        systems;
-
-      devShells.x86_64-linux = lib.mapAttrs
-        (name: cfg: self.devShell ({
-          name = name;
-          system = "x86_64-linux";
-        } // cfg))
-        shells;
-    };
-
-    system = {
+  outputs = { self, nixpkgs }: {
+    __functor = self: {
       stateVersion ? null,
       hostName ? "nixos",
       userName ? "user",
@@ -32,7 +13,6 @@
       rootDevice ? null,
       bootDevice ? null,
       swapDevice ? null,
-      disableNixApps ? true,
       audio ? false,
       gamepad ? false,
       bluetooth ? false,
@@ -53,6 +33,13 @@
 
           # Allow unfree packages
           nixpkgs.config.allowUnfree = true;
+
+          # Remove NixOS default packages
+          environment.defaultPackages = [];
+
+          # Remove other NixOS defaults
+          services.xserver.excludePackages = [ pkgs.xterm ];
+          documentation.nixos.enable = false;
 
           # Add system packages
           environment.systemPackages = packages;
@@ -157,14 +144,6 @@
           # Specify filesystem swap device
           swapDevices = [{ device = swapDevice; }];
         })
-        (lib.mkIf disableNixApps {
-          # Disable documentation and xterm app
-          documentation.nixos.enable = false;
-          services.xserver.excludePackages = [ pkgs.xterm ];
-
-          # Remove NixOS default packages
-          environment.defaultPackages = [];
-        })
         (lib.mkIf audio {
           # Enable RTKit
           security.rtkit.enable = true;
@@ -222,26 +201,6 @@
           services.upower.enable = true;
         })
       ] ++ modules;
-    };
-
-    # DevShell: creates a development shell for a given system and name
-    devShell = {
-      system ? "x86_64-linux",
-      name,
-      packages ? [],
-      hook ? ""
-    }: let
-      pkgs = nixpkgs;
-      resolvedPackages = builtins.map (pkg:
-        if builtins.isString pkg
-        then pkgs.${pkg}
-        else pkg
-      ) packages;
-    in {
-      devShells.${system}.${name} = pkgs.mkShell {
-        packages = resolvedPackages;
-        shellHook = hook;
-      };
     };
   };
 }
