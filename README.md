@@ -3,10 +3,10 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-simplex.url = "github:n1chols/flake-simplex";
+    simple-flake.url = "github:n1chols/nixos-simple-flake";
   };
 
-  outputs = { flake-simplex, ... }: {
+  outputs = { simple-flake, ... }: {
     systems = {
       htpc = {
         stateVersion = "24.11";
