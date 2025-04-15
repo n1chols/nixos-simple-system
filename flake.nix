@@ -28,7 +28,7 @@
       modules = [
         ({ ... }: {
           # Set NixOS state version
-          system.stateVersion = system.stateVersion;
+          #system.stateVersion = system.stateVersion;
 
           # Allow unfree packages
           nixpkgs.config.allowUnfree = true;
