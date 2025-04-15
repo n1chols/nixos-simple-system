@@ -2,42 +2,38 @@
 ```nix
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    simple-flake.url = "github:n1chols/nixos-simple-flake";
+    nixpkgs.url = "github:nixos/nixpkgs/release-24.11";
+    simple-system.url = "github:n1chols/nixos-simple-system";
   };
 
-  outputs = { simple-flake, ... }: {
-    systems = {
-      htpc = {
-        stateVersion = "24.11";
+  outputs = { simple-system, ... }: {
+    nixosConfigurations.desktop = simple-system {
+      hostName = "desktop";
+      userName = "user";
 
-        bootDevice = "/dev/nvme0n1p1";
-        rootDevice = "/dev/nvme0n1p2";
-        swapDevice = "/dev/nvme0n1p3";
+      bootDevice = "/dev/nvme0n1p1";
+      rootDevice = "/dev/nvme0n1p2";
+      swapDevice = "/dev/nvme0n1p3";
 
-        cpuVendor = "amd";
-        gpuVendor = "amd";
+      cpuVendor = "amd";
+      gpuVendor = "amd";
 
-        audio = true;
-        bluetooth = true;
+      audio = true;
+      bluetooth = true;
+      printing = true;
 
-        modules = [
-          ./modules/steam.nix
-          ./modules/kodi.nix
-          ./modules/roon-server.nix
-        ];
-      };
-    };
-    shells = {
-      python = {
-        packages = [ python3 ];
-        hook = "python --version";
-      };
-      java = {
-        packages = [ jdk maven ];
-        hook = "java --version";
-      };
+      modules = [
+        ({ pkgs, ... }: {
+          environment.systemPackages = with pkgs; [
+            firefox
+            obsidian
+          ];
+
+          services.desktopManager.plasma6.enable = true;
+        })
+      ];
     };
   };
 }
+
 ```
