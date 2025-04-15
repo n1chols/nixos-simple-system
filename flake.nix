@@ -27,27 +27,21 @@
       system = systemType;
       modules = [
         ({ ... }: {
-          # Set NixOS state version
-          #system.stateVersion = system.stateVersion;
-
-          # Allow unfree packages
-          nixpkgs.config.allowUnfree = true;
-
-          # Remove NixOS default packages
-          environment.defaultPackages = [];
-
-          # Remove other NixOS defaults
-          services.xserver.excludePackages = [ pkgs.xterm ];
-          documentation.nixos.enable = false;
-
-          # Add system packages
-          environment.systemPackages = packages;
-
           # Enable flakes
           nix.settings = {
             experimental-features = [ "nix-command" "flakes" ];
             warn-dirty = false;
           };
+
+          # Allow unfree packages
+          nixpkgs.config.allowUnfree = true;
+
+          # Remove default packages
+          environment.defaultPackages = [];
+          services.xserver.excludePackages = [ pkgs.xterm ];
+
+          # Add system packages
+          environment.systemPackages = packages;
 
           # Set timezone, locale, and keyboard
           time.timeZone = timeZone;
