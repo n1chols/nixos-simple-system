@@ -41,7 +41,7 @@
           services.xserver.excludePackages = [ pkgs.xterm ];
 
           # Add system packages
-          environment.systemPackages = map (pkg: if lib.isFunction pkg then pkg pkgs else pkgs.${pkg} or pkg) packages;
+          environment.systemPackages = with pkgs; map (pkg: if lib.isFunction pkg then pkg pkgs else pkg) packages;
 
           # Set timezone, locale, and keyboard
           time.timeZone = timeZone;
