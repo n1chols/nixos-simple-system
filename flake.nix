@@ -18,7 +18,6 @@
       printing ? false,
       touchpad ? false,
       battery ? false,
-      packages ? [],
       modules ? []
     }: let
       lib = nixpkgs.lib;
@@ -39,9 +38,6 @@
           # Remove default packages
           environment.defaultPackages = [];
           services.xserver.excludePackages = [ pkgs.xterm ];
-
-          # Add system packages
-          environment.systemPackages = with pkgs; map (pkg: if lib.isFunction pkg then pkg pkgs else pkg) packages;
 
           # Set timezone, locale, and keyboard
           time.timeZone = timeZone;
