@@ -1,10 +1,9 @@
 {
   outputs = { self, nixpkgs }: {
     __functor = self: {
-      stateVersion ? null,
+      systemType ? "x86_64-linux",
       hostName ? "nixos",
       userName ? "user",
-      systemType ? "x86_64-linux",
       timeZone ? "America/Los_Angeles",
       locale ? "en_US.UTF-8",
       keyboardLayout ? "us",
@@ -29,7 +28,7 @@
       modules = [
         ({ ... }: {
           # Set NixOS state version
-          system.stateVersion = stateVersion;
+          system.stateVersion = system.stateVersion;
 
           # Allow unfree packages
           nixpkgs.config.allowUnfree = true;
