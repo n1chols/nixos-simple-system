@@ -1,5 +1,5 @@
 # nixos-simple-system
-A simple and rigid flake to set up as <ins>minimal a system as reasonable</ins> using the <ins>simplest set of options possible</ins>. This flake is intended to be used on personal computers (e.g. desktops, laptops).
+A rigid flake to output a working system for any personal computer using the simplest set of options possible.
 
 ## Options
 Note that the only required option is `rootDevice` to enable a working filesystem.
