@@ -1,5 +1,6 @@
 # nixos-simple-system
 A rigid flake to output a working system for any personal computer using the simplest set of options possible.
+
 This flake works by wrapping `nixpkgs.lib.nixosSystem` which is a more minimal/vanilla alternative to using higher level wrappers like flake-parts.
 
 ## Options
