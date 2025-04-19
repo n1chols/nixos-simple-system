@@ -19,9 +19,9 @@ Note that the only required option is `rootDevice` to enable a working filesyste
 | `audio`          | Enable PipeWire audio                      | `false`               | No       |
 | `gamepad`        | Enable gamepad driver                      | `false`               | No       |
 | `bluetooth`      | Enable Bluetooth                           | `false`               | No       |
-| `printing`       | Enable printing with Avahi                 | `false`               | No       |
-| `touchpad`       | Enable touchpad with libinput              | `false`               | No       |
-| `battery`        | Enable battery management with TLP         | `false`               | No       |
+| `printing`       | Enable printing w/ discovery               | `false`               | No       |
+| `touchpad`       | Enable touchpad                            | `false`               | No       |
+| `battery`        | Enable battery management                  | `false`               | No       |
 | `modules`        | Additional NixOS modules                   | `[]`                  | No       |
 
 ## Usage Example
