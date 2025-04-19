@@ -40,8 +40,8 @@ You can set up a working and featured system with a configuration like the follo
       hostName = "desktop";
       userName = "user";
 
-      bootDevice = "/dev/nvme0n1p1";
       rootDevice = "/dev/nvme0n1p2";
+      bootDevice = "/dev/nvme0n1p1";
 
       cpuVendor = "amd";
       gpuVendor = "amd";
