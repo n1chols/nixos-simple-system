@@ -1,5 +1,5 @@
 # nixos-simple-system
-A rigid flake to output a working system for any personal computer using the simplest set of options possible.
+A rigid flake to output a working system for any personal computer using the simplest set of options possible. This flake is meant to be a drop in replacement for `nixpkgs.lib.nixosSystem`.
 
 ## Options
 Note that the only required option is `rootDevice` to enable a working filesystem.
@@ -25,7 +25,7 @@ Note that the only required option is `rootDevice` to enable a working filesyste
 | `modules`        | Additional NixOS modules                   | `[]`                  | No       |
 
 ## Usage Example
-You can set up a working and featured system with only the following:
+You can set up a working and featured system with a configuration like the following:
 ```nix
 {
   inputs = {
