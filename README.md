@@ -25,7 +25,7 @@ Note that the only required option is `rootDevice` to enable a working filesyste
 | `modules`        | Additional NixOS modules                   | `[]`                  | No       |
 
 ## Usage Example
-You can set up a working and featured system with just the following:
+You can set up a working and featured system with only the following:
 ```nix
 {
   inputs = {
