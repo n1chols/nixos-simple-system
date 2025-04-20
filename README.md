@@ -8,8 +8,6 @@ Note that the only required option is `rootDevice` to enable a working filesyste
 | Option           | Description                                | Default               | Required |
 |------------------|--------------------------------------------|-----------------------|----------|
 | `systemType`     | System architecture                        | `x86_64-linux`        | No       |
-| `hostName`       | System hostname                            | `nixos`               | No       |
-| `userName`       | Primary user                               | `user`                | No       |
 | `timeZone`       | System timezone                            | `America/Los_Angeles` | No       |
 | `locale`         | System locale                              | `en_US.UTF-8`         | No       |
 | `keyboardLayout` | Keyboard layout                            | `us`                  | No       |
@@ -21,9 +19,10 @@ Note that the only required option is `rootDevice` to enable a working filesyste
 | `audio`          | Enable PipeWire audio                      | `false`               | No       |
 | `bluetooth`      | Enable Bluetooth                           | `false`               | No       |
 | `printing`       | Enable printing w/ discovery               | `false`               | No       |
-| `touchpad`       | Enable touchpad                            | `false`               | No       |
 | `gamepad`        | Enable gamepad driver                      | `false`               | No       |
+| `touchpad`       | Enable touchpad                            | `false`               | No       |
 | `battery`        | Enable battery management                  | `false`               | No       |
+| `virtualization` | Enable virtualization                      | `false`               | No       |
 | `modules`        | Additional NixOS modules                   | `[]`                  | No       |
 
 ## Usage Example
