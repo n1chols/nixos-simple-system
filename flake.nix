@@ -5,6 +5,8 @@
       timeZone ? "America/Los_Angeles",
       locale ? "en_US.UTF-8",
       keyboardLayout ? "us",
+      hostName ? "nixos",
+      userName ? "user",
       rootDevice ? null,
       bootDevice ? null,
       swapDevice ? null,
@@ -47,11 +49,11 @@
           networking = {
             networkmanager.enable = true;
             useDHCP = lib.mkDefault true;
-            hostName = "nixos";
+            hostName = hostName;
           };
 
           # Create user
-          users.users.user = {
+          users.users.${userName} = {
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
           };
