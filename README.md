@@ -4,7 +4,6 @@ A rigid flake to output a working system for any personal computer using the sim
 This flake works by wrapping `nixpkgs.lib.nixosSystem`, intending to be a more minimal/vanilla alternative to higher level wrappers like [flake-parts](https://github.com/hercules-ci/flake-parts).
 
 ## Options
-Note that the only required option is `rootDevice` to enable a working filesystem.
 | Option           | Description                                | Default               |
 |------------------|--------------------------------------------|-----------------------|
 | `systemType`     | System architecture                        | `x86_64-linux`        |
