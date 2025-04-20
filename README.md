@@ -10,6 +10,8 @@ This flake works by wrapping `nixpkgs.lib.nixosSystem`, intending to be a more m
 | `timeZone`       | System timezone                            | `America/Los_Angeles` |
 | `locale`         | System locale                              | `en_US.UTF-8`         |
 | `keyboardLayout` | Keyboard layout                            | `us`                  |
+| `hostName`       | System hostname                            | `nixos`               |
+| `userName`       | Primary user                               | `user`                |
 | `rootDevice`     | Root filesystem device                     | None                  |
 | `bootDevice`     | Boot filesystem device (will enable EFI)   | None                  |
 | `swapDevice`     | Swap device                                | None                  |
