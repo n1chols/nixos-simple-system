@@ -59,7 +59,8 @@
           # Specify filesystem root device
           fileSystems."/" = {
             device = rootDevice;
-            fsType = "ext4";
+            fsType = if rootDevice == null then "tmpfs" else "ext4";
+            options = lib.mkIf (rootDevice == null) [ "mode=0755" "size=2G" ];
           };
 
           # Enable firmware and graphics
