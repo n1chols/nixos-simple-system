@@ -5,25 +5,25 @@ This flake works by wrapping `nixpkgs.lib.nixosSystem`, intending to be a more m
 
 ## Options
 Note that the only required option is `rootDevice` to enable a working filesystem.
-| Option           | Description                                | Default               | Required |
-|------------------|--------------------------------------------|-----------------------|----------|
-| `systemType`     | System architecture                        | `x86_64-linux`        | No       |
-| `timeZone`       | System timezone                            | `America/Los_Angeles` | No       |
-| `locale`         | System locale                              | `en_US.UTF-8`         | No       |
-| `keyboardLayout` | Keyboard layout                            | `us`                  | No       |
-| `rootDevice`     | Root filesystem device                     | None                  | Yes      |
-| `bootDevice`     | Boot filesystem device (will enable EFI)   | None                  | No       |
-| `swapDevice`     | Swap device                                | None                  | No       |
-| `cpuVendor`      | CPU vendor (`intel`, `amd`)                | None                  | No       |
-| `gpuVendor`      | GPU vendor (`intel`, `amd`, `nvidia`)      | None                  | No       |
-| `audio`          | Enable PipeWire audio                      | `false`               | No       |
-| `bluetooth`      | Enable Bluetooth                           | `false`               | No       |
-| `printing`       | Enable printing w/ discovery               | `false`               | No       |
-| `gamepad`        | Enable gamepad driver                      | `false`               | No       |
-| `touchpad`       | Enable touchpad                            | `false`               | No       |
-| `battery`        | Enable battery management                  | `false`               | No       |
-| `virtualization` | Enable virtualization                      | `false`               | No       |
-| `modules`        | Additional NixOS modules                   | `[]`                  | No       |
+| Option           | Description                                | Default               |
+|------------------|--------------------------------------------|-----------------------|
+| `systemType`     | System architecture                        | `x86_64-linux`        |
+| `timeZone`       | System timezone                            | `America/Los_Angeles` |
+| `locale`         | System locale                              | `en_US.UTF-8`         |
+| `keyboardLayout` | Keyboard layout                            | `us`                  |
+| `rootDevice`     | Root filesystem device                     | None                  |
+| `bootDevice`     | Boot filesystem device (will enable EFI)   | None                  |
+| `swapDevice`     | Swap device                                | None                  |
+| `cpuVendor`      | CPU vendor (`intel`, `amd`)                | None                  |
+| `gpuVendor`      | GPU vendor (`intel`, `amd`, `nvidia`)      | None                  |
+| `audio`          | Enable PipeWire audio                      | `false`               |
+| `bluetooth`      | Enable Bluetooth                           | `false`               |
+| `printing`       | Enable printing w/ discovery               | `false`               |
+| `gamepad`        | Enable gamepad driver                      | `false`               |
+| `touchpad`       | Enable touchpad                            | `false`               |
+| `battery`        | Enable battery management                  | `false`               |
+| `virtualization` | Enable virtualization                      | `false`               |
+| `modules`        | Additional NixOS modules                   | `[]`                  |
 
 ## Usage Example
 You can set up a working and featured system with a configuration like the following:
