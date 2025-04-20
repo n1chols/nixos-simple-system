@@ -19,10 +19,10 @@ Note that the only required option is `rootDevice` to enable a working filesyste
 | `cpuVendor`      | CPU vendor (`intel`, `amd`)                | None                  | No       |
 | `gpuVendor`      | GPU vendor (`intel`, `amd`, `nvidia`)      | None                  | No       |
 | `audio`          | Enable PipeWire audio                      | `false`               | No       |
-| `gamepad`        | Enable gamepad driver                      | `false`               | No       |
 | `bluetooth`      | Enable Bluetooth                           | `false`               | No       |
 | `printing`       | Enable printing w/ discovery               | `false`               | No       |
 | `touchpad`       | Enable touchpad                            | `false`               | No       |
+| `gamepad`        | Enable gamepad driver                      | `false`               | No       |
 | `battery`        | Enable battery management                  | `false`               | No       |
 | `modules`        | Additional NixOS modules                   | `[]`                  | No       |
 
