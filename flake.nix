@@ -2,8 +2,6 @@
   outputs = { self, nixpkgs }: {
     __functor = self: {
       systemType ? "x86_64-linux",
-      hostName ? "nixos",
-      userName ? "user",
       timeZone ? "America/Los_Angeles",
       locale ? "en_US.UTF-8",
       keyboardLayout ? "us",
@@ -15,9 +13,10 @@
       audio ? false,
       bluetooth ? false,
       printing ? false,
-      touchpad ? false,
       gamepad ? false,
+      touchpad ? false,
       battery ? false,
+      virtualization ? false,
       modules ? []
     }: let
       lib = nixpkgs.lib;
@@ -48,11 +47,11 @@
           networking = {
             networkmanager.enable = true;
             useDHCP = lib.mkDefault true;
-            hostName = hostName;
+            hostName = "nixos";
           };
 
           # Create user
-          users.users.${userName} = {
+          users.users.user = {
             isNormalUser = true;
             extraGroups = [ "wheel" "networkmanager" ];
           };
@@ -74,15 +73,11 @@
           };
         })
         (lib.mkIf (bootDevice == null) {
-          # Enable GRUB bootloader
-          boot.loader.grub = {
-            enable = true;
-            devices = [ rootDevice ];
-            efiSupport = false;
-          };
+          # Enable syslinux boot loader
+          boot.loader.syslinux.enable = true;
         })
         (lib.mkIf (bootDevice != null) {
-          # Enable EFI boot loader
+          # Enable systemd boot loader
           boot.loader = {
             systemd-boot = {
               enable = true;
@@ -113,17 +108,26 @@
           hardware.cpu.amd.updateMicrocode = true;
         })
         (lib.mkIf (gpuVendor == "intel") {
+          # Enable kvm-intel driver
+          boot.kernelModules = [] ++ lib.optionals virtualization [ "kvm-intel" ];
+
           # Enable intel media driver
           hardware.graphics.extraPackages = [ pkgs.intel-media-driver ];
+
+          # Enable intel driver for xserver
+          services.xserver.videoDrivers = [ "intel" ];
         })
         (lib.mkIf (gpuVendor == "amd") {
           # Enable amdgpu and kvm-amd driver
-          boot.kernelModules = [ "amdgpu" "kvm-amd" ];
+          boot.kernelModules = [ "amdgpu" ] ++ lib.optionals virtualization [ "kvm-amd" ];
 
           # Enable amdgpu driver for xserver
           services.xserver.videoDrivers = [ "amdgpu" ];
         })
         (lib.mkIf (gpuVendor == "nvidia") {
+          # Enable vfio-pci driver
+          boot.kernelModules = [] ++ lib.optionals virtualization [ "vfio-pci" ];
+
           # Enable nvidia driver
           hardware.nvidia = {
             open = false;
@@ -131,6 +135,8 @@
             modesetting.enable = true;
             package = pkgs.linuxPackages.nvidiaPackages.stable;
           };
+
+          # Enable nvidia driver for xserver
           services.xserver.videoDrivers = [ "nvidia" ];
         })
         (lib.mkIf audio {
@@ -163,6 +169,10 @@
             openFirewall = true;
           };
         })
+        (lib.mkIf gamepad {
+          # Enable xpadneo driver
+          hardware.xpadneo.enable = true;
+        })
         (lib.mkIf touchpad {
           # Enable touchpad input
           services.xserver.libinput = {
@@ -172,10 +182,6 @@
               naturalScrolling = true;
             };
           };
-        })
-        (lib.mkIf gamepad {
-          # Enable xpadneo driver
-          hardware.xpadneo.enable = true;
         })
         (lib.mkIf battery {
           # Enable tlp with defaults
