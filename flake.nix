@@ -13,10 +13,10 @@
       cpuVendor ? null,
       gpuVendor ? null,
       audio ? false,
-      gamepad ? false,
       bluetooth ? false,
       printing ? false,
       touchpad ? false,
+      gamepad ? false,
       battery ? false,
       modules ? []
     }: let
@@ -150,10 +150,6 @@
             };
           };
         })
-        (lib.mkIf gamepad {
-          # Enable xpadneo driver
-          hardware.xpadneo.enable = true;
-        })
         (lib.mkIf bluetooth {
           # Enable bluetooth driver
           hardware.bluetooth = {
@@ -181,6 +177,10 @@
               naturalScrolling = true;
             };
           };
+        })
+        (lib.mkIf gamepad {
+          # Enable xpadneo driver
+          hardware.xpadneo.enable = true;
         })
         (lib.mkIf battery {
           # Enable tlp with defaults
