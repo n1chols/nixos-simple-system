@@ -137,17 +137,12 @@
           # Enable RTKit
           security.rtkit.enable = true;
 
-          # Enable PipeWire with sample rate switching
+          # Enable PipeWire
           services.pipewire = {
             enable = true;
             alsa.enable = true;
             alsa.support32Bit = true;
             pulse.enable = true;
-            extraConfig.pipewire = {
-              "context.properties" = {
-                "default.clock.allowed-rates" = [ 44100 48000 88200 96000 176400 192000 ];
-              };
-            };
           };
         })
         (lib.mkIf bluetooth {
