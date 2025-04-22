@@ -70,33 +70,30 @@
 
           # Specify filesystem root device
           fileSystems."/" = {
+            device = rootDevice;
             fsType = "ext4";
-            device = rootDevice;
           };
-
-          # Enable GRUB boot loader
-          boot.loader.grub = {
-            enable = true;
-            useOSProber = true;
-            device = rootDevice;
-          };
+        })
+        (lib.mkIf (bootDevice == null) {
+          # Enable syslinux boot loader
+          boot.loader.syslinux.enable = true;
         })
         (lib.mkIf (bootDevice != null) {
           # Specify filesystem boot device
           fileSystems."/boot" = {
-            fsType = "vfat";
             device = bootDevice;
+            fsType = "vfat";
           };
 
-          # Enable boot loader EFI
+          # Enable EFI and systemd boot loader
           boot.loader = {
+            systemd-boot = {
+              enable = true;
+              configurationLimit = 10;
+            };
             efi = {
               canTouchEfiVariables = true;
               efiSysMountPoint = "/boot";
-            };
-            grub = {
-               efiSupport = true;
-               device = "nodev";
             };
           };
         })
