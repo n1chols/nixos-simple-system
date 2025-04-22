@@ -80,6 +80,12 @@
           boot.loader.syslinux.enable = true;
         })
         (lib.mkIf (bootDevice != null) {
+          # Specify filesystem boot device
+          fileSystems."/boot" = {
+            device = bootDevice;
+            fsType = "vfat";
+          };
+
           # Enable systemd boot loader
           boot.loader = {
             systemd-boot = {
@@ -90,12 +96,6 @@
               canTouchEfiVariables = true;
               efiSysMountPoint = "/boot";
             };
-          };
-
-          # Specify filesystem boot device
-          fileSystems."/boot" = {
-            device = bootDevice;
-            fsType = "vfat";
           };
         })
         (lib.mkIf (swapDevice != null) {
