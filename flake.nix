@@ -58,13 +58,6 @@
             extraGroups = [ "wheel" "networkmanager" ];
           };
 
-          # Specify filesystem root device
-          fileSystems."/" = {
-            device = rootDevice;
-            fsType = if rootDevice == null then "tmpfs" else "ext4";
-            options = lib.mkIf (rootDevice == null) [ "mode=0755" ];
-          };
-
           # Enable firmware and graphics
           hardware = {
             enableAllFirmware = true;
@@ -74,27 +67,36 @@
               enable32Bit = true;
             };
           };
-        })
-        (lib.mkIf (bootDevice == null) {
-          # Enable syslinux boot loader
-          boot.loader.syslinux.enable = true;
+
+          # Specify filesystem root device
+          fileSystems."/" = {
+            fsType = "ext4";
+            device = rootDevice;
+          };
+
+          # Enable GRUB boot loader
+          boot.loader.grub = {
+            enable = true;
+            useOSProber = true;
+            device = rootDevice;
+          };
         })
         (lib.mkIf (bootDevice != null) {
           # Specify filesystem boot device
           fileSystems."/boot" = {
-            device = bootDevice;
             fsType = "vfat";
+            device = bootDevice;
           };
 
-          # Enable systemd boot loader
+          # Enable boot loader EFI
           boot.loader = {
-            systemd-boot = {
-              enable = true;
-              configurationLimit = 10;
-            };
             efi = {
               canTouchEfiVariables = true;
               efiSysMountPoint = "/boot";
+            };
+            grub = {
+               efiSupport = true;
+               device = "nodev";
             };
           };
         })
