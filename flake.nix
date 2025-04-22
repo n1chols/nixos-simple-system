@@ -71,10 +71,6 @@
             fsType = "ext4";
           };
         })
-        (lib.mkIf (bootDevice == null) {
-          # Enable syslinux boot loader
-          boot.loader.syslinux.enable = true;
-        })
         (lib.mkIf (bootDevice != null) {
           # Specify filesystem boot device
           fileSystems."/boot" = {
@@ -93,6 +89,10 @@
               efiSysMountPoint = "/boot";
             };
           };
+        })
+        (lib.mkIf (bootDevice == null) {
+          # Enable syslinux boot loader
+          boot.loader.syslinux.enable = true;
         })
         (lib.mkIf (swapDevice != null) {
           # Specify filesystem swap device
