@@ -28,10 +28,7 @@
       modules = [
         ({ ... }: {
           # Enable flakes
-          nix.settings = {
-            experimental-features = [ "nix-command" "flakes" ];
-            warn-dirty = false;
-          };
+          nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
           # Allow unfree packages
           nixpkgs.config.allowUnfree = true;
