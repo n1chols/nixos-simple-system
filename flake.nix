@@ -58,7 +58,6 @@
           # Enable firmware and graphics
           hardware = {
             enableAllFirmware = true;
-            enableRedistributableFirmware = true;
             graphics = {
               enable = true;
               enable32Bit = true;
